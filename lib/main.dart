@@ -41,7 +41,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  late String _email = "macaipe.ltd5@gmail.com";
+  String _email = "macaipe.ltd5@gmail.com";
   late String _password;
   final client = Supabase.instance.client;
   bool _isLoading = false;
@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ? CircularProgressIndicator()
             : SingleChildScrollView(
                 child: Padding(
-                  padding: EdgeInsets.all(defaultPadding) ,
+                  padding: EdgeInsets.all(defaultPadding),
                   child: Column(
                     children: <Widget>[
                       Image.asset('assets/images/Logo.png'),
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: 600),
                         child: Container(
-                          padding: EdgeInsets.all(defaultPadding) ,
+                          padding: EdgeInsets.all(defaultPadding),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10.0),

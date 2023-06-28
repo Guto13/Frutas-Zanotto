@@ -1,9 +1,17 @@
+// ignore_for_file: prefer_final_fields, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
+import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
+import 'package:maca_ipe/componetes_gerais/campo_retorno.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/embalagem.dart';
+import 'package:maca_ipe/datas/entradas.dart';
+import 'package:maca_ipe/datas/estoque.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/datas/produtor.dart';
+import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EntradaEstoque extends StatefulWidget {
@@ -16,9 +24,11 @@ class EntradaEstoque extends StatefulWidget {
 class _EntradaEstoqueState extends State<EntradaEstoque> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  DateTime _data = DateTime.now();
   late List<Fruta> frutas;
   late List<Embalagem> embalagens;
   late List<Produtor> produtores;
+  final _quant = TextEditingController();
 
   Fruta? _frutaSelecionada;
   Embalagem? _embalagemSelecionada;
@@ -235,14 +245,11 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                                 children: [
                                   Expanded(
                                     flex: 1,
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        labelText: 'Fruta',
-                                      ),
-                                      readOnly: true,
+                                    child: CampoRetorno(
                                       controller: TextEditingController(
                                           text:
                                               _frutaSelecionada?.nomeVariedade),
+                                      label: 'Fruta',
                                     ),
                                   ),
                                   const SizedBox(
@@ -250,14 +257,11 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                                   ),
                                   Expanded(
                                     flex: 1,
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        labelText: 'Embalagem',
-                                      ),
-                                      readOnly: true,
+                                    child: CampoRetorno(
                                       controller: TextEditingController(
                                           text:
                                               _embalagemSelecionada?.nomePeso),
+                                      label: 'Embalagem',
                                     ),
                                   ),
                                   const SizedBox(
@@ -265,20 +269,66 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                                   ),
                                   Expanded(
                                     flex: 1,
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        labelText: 'Produtor',
-                                      ),
-                                      readOnly: true,
+                                    child: CampoRetorno(
                                       controller: TextEditingController(
-                                        text:
-                                            _produtorSelecionado?.nomeCompleto,
+                                          text: _produtorSelecionado
+                                              ?.nomeCompleto),
+                                      label: 'Produtor',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: defaultPadding,
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextFormField(
+                                      controller: _quant,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Quantidade',
+                                      ),
+                                      validator: (value) {
+                                        if (value?.isEmpty ?? true) {
+                                          return 'Por favor, preencha este campo';
+                                        }
+                                        return null;
+                                      },
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: <TextInputFormatter>[
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp(r'[0-9]')),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: defaultPadding * 4,
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextFormField(
+                                      readOnly: true,
+                                      initialValue:
+                                          '${_data.day}/${_data.month}/${_data.year}',
+                                      decoration: const InputDecoration(
+                                        labelText: 'Data',
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-
+                              const SizedBox(
+                                height: defaultPadding * 4,
+                              ),
+                              Center(
+                                child: BotaoPadrao(
+                                    context: context,
+                                    title: 'Salvar',
+                                    onPressed: _salvar),
+                              ),
                             ],
                           ),
                         )
@@ -289,5 +339,68 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
               ),
       ),
     );
+  }
+
+  Future<void> _salvar() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
+    Entradas entrada = Entradas(
+        id: 1,
+        frutaId: _frutaSelecionada!.id,
+        embalagemId: _embalagemSelecionada!.id,
+        quantidade: double.parse(_quant.value.text),
+        produtorId: _produtorSelecionado!.id,
+        data: _data);
+
+    try {
+      await client.from('Entradas').insert(entrada.toMap());
+
+      await processaEntradaSC(
+          client, entrada.frutaId, entrada.produtorId, entrada.embalagemId, entrada.quantidade);
+
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            "Entrada cadastrada com sucesso",
+            style: TextStyle(color: textColor),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+    } on PostgrestException catch (error) {
+      if (error.message ==
+          'duplicate key value violates unique constraint "Entradas_pkey"') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text("Identificador já existente"),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ));
+        print(error.message);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text("Ocorreu um erro, tente novamente!"),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ));
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }
