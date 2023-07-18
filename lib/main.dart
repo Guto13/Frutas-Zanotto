@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors, library_private_types_in_public_api, sort_child_properties_last, await_only_futures
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
         title: 'Minha Firma',
         theme: ThemeData(
           scaffoldBackgroundColor: bgColor.withOpacity(0.9),
@@ -175,4 +177,14 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+ // Override behavior methods and getters like dragDevices
+ @override
+ Set<PointerDeviceKind> get dragDevices => {
+   PointerDeviceKind.touch,
+   PointerDeviceKind.mouse,
+   // etc.
+ };
 }

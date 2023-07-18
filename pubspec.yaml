@@ -38,6 +38,7 @@ dependencies:
   supabase_flutter: ^1.10.3
   flutter_svg: ^2.0.5
   mask_text_input_formatter: ^2.4.0
+  data_table_2: ^2.4.2
 
 
 dev_dependencies:

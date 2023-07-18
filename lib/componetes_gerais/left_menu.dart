@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/main.dart';
+import 'package:maca_ipe/screens/classificacao/classificacao_screen.dart';
 import 'package:maca_ipe/screens/estoque/estoque_screen.dart';
+import 'package:maca_ipe/screens/home_page.dart';
+import 'package:maca_ipe/screens/paletes/paletes_screen.dart';
 import 'package:maca_ipe/screens/produtores/produtores_screen.dart';
 import 'package:maca_ipe/screens/produtos/Frutas/frutas_screen.dart';
 import 'package:maca_ipe/screens/produtos/embalagens/embalagens_screen.dart';
+import 'package:maca_ipe/screens/romaneio/romaneio_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LeftMenu extends StatelessWidget {
@@ -23,10 +27,16 @@ class LeftMenu extends StatelessWidget {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            DrawerHeader(
-              padding: const EdgeInsets.all(defaultPadding),
-              child: Image.asset(
-                'assets/images/Logo.png',
+            InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              ),
+              child: DrawerHeader(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: Image.asset(
+                  'assets/images/Logo.png',
+                ),
               ),
             ),
             MenuButton(
@@ -58,7 +68,32 @@ class LeftMenu extends StatelessWidget {
               icon: 'assets/icons/stock.svg',
               press: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const EstoqueScreen()),
+                MaterialPageRoute(builder: (context) => EstoqueScreen()),
+              ),
+            ),
+            MenuButton(
+              title: 'Classificação',
+              icon: 'assets/icons/classification.svg',
+              press: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ClassificacaoScreen()),
+              ),
+            ),
+            MenuButton(
+              title: 'Romaneio',
+              icon: 'assets/icons/romaneio.svg',
+              press: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RomaneioScreen()),
+              ),
+            ),
+            MenuButton(
+              title: 'Paletes',
+              icon: 'assets/icons/truck.svg',
+              press: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PaletesScreen()),
               ),
             ),
             MenuButton(

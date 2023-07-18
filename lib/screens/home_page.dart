@@ -3,7 +3,6 @@ import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/componetes_gerais/left_menu.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
 
@@ -21,11 +20,7 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Expanded(child: LeftMenu(client: client)),
-                    Expanded(
-                        flex: 5,
-                        child: Container(
-                          color: Colors.orangeAccent,
-                        ))
+                    Expanded(flex: 5, child: Container())
                   ]),
             );
           } else {
@@ -41,5 +36,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
-

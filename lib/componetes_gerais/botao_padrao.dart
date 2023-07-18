@@ -22,7 +22,7 @@ class BotaoPadrao extends StatelessWidget {
           backgroundColor: buttonColor,
         ),
         onPressed: onPressed,
-        child: Text(title, style: const TextStyle(color: textColor)),
+        child: Text(title, style: const TextStyle(color: textColorBT)),
       ),
     );
   }
