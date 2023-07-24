@@ -5,7 +5,6 @@ import 'package:maca_ipe/main.dart';
 import 'package:maca_ipe/screens/classificacao/classificacao_screen.dart';
 import 'package:maca_ipe/screens/estoque/estoque_screen.dart';
 import 'package:maca_ipe/screens/home_page.dart';
-import 'package:maca_ipe/screens/paletes/paletes_screen.dart';
 import 'package:maca_ipe/screens/produtores/produtores_screen.dart';
 import 'package:maca_ipe/screens/produtos/Frutas/frutas_screen.dart';
 import 'package:maca_ipe/screens/produtos/embalagens/embalagens_screen.dart';
@@ -89,13 +88,7 @@ class LeftMenu extends StatelessWidget {
               ),
             ),
             MenuButton(
-              title: 'Paletes',
-              icon: 'assets/icons/truck.svg',
-              press: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PaletesScreen()),
-              ),
-            ),
+                title: 'Paletes', icon: 'assets/icons/truck.svg', press: () {}),
             MenuButton(
               title: 'Carga',
               icon: 'assets/icons/truck.svg',

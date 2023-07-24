@@ -1,25 +1,30 @@
-class EstoqueLista {
+class ClassifiLista {
   final int id;
   final FrutaEstoque fruta;
   final EmbalagemEstoque embalagem;
   final ProdutorEstoque produtor;
   final double quantidade;
+  final DateTime data;
+  final double refugo;
 
-  EstoqueLista({
-    required this.id,
-    required this.fruta,
-    required this.embalagem,
-    required this.produtor,
-    required this.quantidade,
-  });
+  ClassifiLista(
+      {required this.id,
+      required this.fruta,
+      required this.embalagem,
+      required this.produtor,
+      required this.quantidade,
+      required this.data,
+      required this.refugo});
 
-  factory EstoqueLista.fromJson(Map<String, dynamic> json) {
-    return EstoqueLista(
+  factory ClassifiLista.fromJson(Map<String, dynamic> json) {
+    return ClassifiLista(
       quantidade: json['Quantidade'],
       id: json['id'],
       fruta: FrutaEstoque.fromJson(json['Fruta']),
       embalagem: EmbalagemEstoque.fromJson(json['Embalagem']),
       produtor: ProdutorEstoque.fromJson(json['Produtor']),
+      data: DateTime.parse(json['Data']),
+      refugo: json['Refugo'],
     );
   }
 }
@@ -31,7 +36,8 @@ class FrutaEstoque {
 
   FrutaEstoque({
     required this.nome,
-    required this.variedade, required this.id,
+    required this.variedade,
+    required this.id,
   });
 
   factory FrutaEstoque.fromJson(Map<String, dynamic> json) {
@@ -48,7 +54,8 @@ class EmbalagemEstoque {
   String nome;
 
   EmbalagemEstoque({
-    required this.nome,required this.id,
+    required this.nome,
+    required this.id,
   });
 
   factory EmbalagemEstoque.fromJson(Map<String, dynamic> json) {
@@ -65,8 +72,9 @@ class ProdutorEstoque {
   String sobrenome;
 
   ProdutorEstoque({
+    required this.id,
     required this.nome,
-    required this.sobrenome, required this.id,
+    required this.sobrenome,
   });
 
   factory ProdutorEstoque.fromJson(Map<String, dynamic> json) {

@@ -1,0 +1,46 @@
+class Classificacao {
+  final int id;
+  final int frutaId;
+  final int embalagemId;
+  final int produtorId;
+  final double quantidade;
+  final DateTime data;
+  final int romaneioId;
+  final double refugo;
+
+  Classificacao({
+    required this.id,
+    required this.frutaId,
+    required this.embalagemId,
+    required this.quantidade,
+    required this.produtorId,
+    required this.data,
+    required this.romaneioId,
+    required this.refugo,
+  });
+
+  factory Classificacao.fromJson(Map<String, dynamic> json) {
+    return Classificacao(
+      id: json['id'],
+      frutaId: json['FrutaId'],
+      embalagemId: json['EmbalagemId'],
+      produtorId: json['ProdutorId'],
+      quantidade: json['Quantidade'],
+      data: DateTime.parse(json['Data']),
+      romaneioId: json['RomaneioId'],
+      refugo: json['Refugo'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'FrutaId': frutaId,
+      'EmbalagemId': embalagemId,
+      'Quantidade': quantidade,
+      'ProdutorId': produtorId,
+      'Data': data.toIso8601String(),
+      'RomaneioId': romaneioId,
+      'Refugo': refugo,
+    };
+  }
+}

@@ -11,5 +11,7 @@ const Color bgColor = Color.fromARGB(255, 72, 108, 125);
 const Color iconColor = Colors.red;
 
 const defaultPadding = 16.0;
+const fontTitle = 20.0;
+const fontSubTitle = 16.0;
 
-const maxWidthArea = 860;
+const maxWidthArea = 900;

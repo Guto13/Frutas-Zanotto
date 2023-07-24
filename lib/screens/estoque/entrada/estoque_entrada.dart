@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_final_fields, use_build_context_synchronously
 
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
@@ -25,10 +26,11 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   DateTime _data = DateTime.now();
+  final _quant = TextEditingController();
   late List<Fruta> frutas;
   late List<Embalagem> embalagens;
   late List<Produtor> produtores;
-  final _quant = TextEditingController();
+  
 
   Fruta? _frutaSelecionada;
   Embalagem? _embalagemSelecionada;
@@ -37,17 +39,26 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
   final client = Supabase.instance.client;
 
   Future<List<Fruta>> fetchFrutas(SupabaseClient client) async {
-    final frutasJson = await client.from("Fruta").select();
+    final frutasJson = await client
+        .from("Fruta")
+        .select()
+        .order('Nome', ascending: true)
+        .order('Variedade', ascending: true);
     return parseFrutas(frutasJson);
   }
 
   Future<List<Embalagem>> fetchEmbalagens(SupabaseClient client) async {
-    final embalagensJson = await client.from("Embalagem").select();
+    final embalagensJson =
+        await client.from("Embalagem").select().order('Nome', ascending: true);
     return parseEmbalagem(embalagensJson);
   }
 
   Future<List<Produtor>> fetchProdutores(SupabaseClient client) async {
-    final produtoresJson = await client.from("Produtor").select();
+    final produtoresJson = await client
+        .from("Produtor")
+        .select()
+        .order('Nome', ascending: true)
+        .order('Sobrenome', ascending: true);
     return parseProdutor(produtoresJson);
   }
 
@@ -338,8 +349,8 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                                         flex: 1,
                                         child: TextFormField(
                                           readOnly: true,
-                                          initialValue:
-                                              '${_data.day}/${_data.month}/${_data.year}',
+                                          initialValue: formatDate(
+                                              _data, [dd, '-', mm, '-', yyyy]),
                                           decoration: const InputDecoration(
                                             labelText: 'Data',
                                           ),

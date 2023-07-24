@@ -1,46 +1,44 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/alert.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
-import 'package:maca_ipe/datas/entrada_lista.dart';
+import 'package:maca_ipe/datas/classifi_lista.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class TabelaEntrada extends StatefulWidget {
-  const TabelaEntrada({Key? key}) : super(key: key);
+class TabelaClassifi extends StatefulWidget {
+  const TabelaClassifi({Key? key}) : super(key: key);
 
   @override
-  State<TabelaEntrada> createState() => _TabelaEntradaState();
+  State<TabelaClassifi> createState() => _TabelaClassifiState();
 }
 
-class _TabelaEntradaState extends State<TabelaEntrada> {
+class _TabelaClassifiState extends State<TabelaClassifi> {
   final client = Supabase.instance.client;
-  List<EntradaLista> entradas = [];
+  List<ClassifiLista> classifi = [];
   bool _isloading = false;
 
-  Future<List<EntradaLista>> buscarEntradas(SupabaseClient client) async {
-    final entradasJson = await client
-        .from('Entradas')
+  Future<List<ClassifiLista>> buscarClassifi(SupabaseClient client) async {
+    final classifisJson = await client
+        .from('Classificacao')
         .select(
-            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome), Data')
+            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome), Data, Refugo')
         .order('Data');
 
-    return parseEntrada(entradasJson);
+    return parseClassifi(classifisJson);
   }
 
-  List<EntradaLista> parseEntrada(List<dynamic> responseBody) {
-    List<EntradaLista> entradas =
-        responseBody.map((e) => EntradaLista.fromJson(e)).toList();
-    return entradas;
+  List<ClassifiLista> parseClassifi(List<dynamic> responseBody) {
+    List<ClassifiLista> classifis =
+        responseBody.map((e) => ClassifiLista.fromJson(e)).toList();
+    return classifis;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: CustomAppBar(title: "Tabela Entradas"),
+        appBar: CustomAppBar(title: "Lista Classificações"),
         body: Padding(
           padding: const EdgeInsets.all(defaultPadding),
           child: Container(
@@ -52,11 +50,13 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
               ),
             ),
             child: _isloading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
                 : SizedBox(
                     width: double.infinity,
-                    child: FutureBuilder<List<EntradaLista>>(
-                      future: buscarEntradas(client),
+                    child: FutureBuilder<List<ClassifiLista>>(
+                      future: buscarClassifi(client),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -64,7 +64,7 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
                             child: CircularProgressIndicator(),
                           );
                         } else if (snapshot.hasData) {
-                          entradas = snapshot.data!;
+                          classifi = snapshot.data!;
                           return SingleChildScrollView(
                             child: SizedBox(
                               width: double.infinity,
@@ -81,11 +81,12 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
                                 columns: [
                                   columnTable('Fruta'),
                                   columnTable('Quantidade'),
+                                  columnTable('Refugo'),
                                   columnTable('Embalagem'),
                                   columnTable('Produtor'),
                                   columnTable('Data'),
                                 ],
-                                rows: entradas.map((e) {
+                                rows: classifi.map((e) {
                                   return DataRow(
                                       onLongPress: () {
                                         showDialog(
@@ -93,7 +94,7 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
                                           builder: (BuildContext context) {
                                             return Alert(
                                               content:
-                                                  'Deseja mesmo excluir está entrada?',
+                                                  'Deseja mesmo excluir está Classificação?',
                                               title: 'Deletar',
                                               onCancel: () {
                                                 Navigator.of(context).pop();
@@ -102,12 +103,31 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
                                                 setState(() {
                                                   _isloading = true;
                                                 });
-                                                _onConfirm(
-                                                    e.id,
-                                                    e.fruta.id,
-                                                    e.produtor.id,
-                                                    e.embalagem.id,
-                                                    e.quantidade);
+                                                Duration diference =
+                                                    DateTime.now()
+                                                        .difference(e.data);
+
+                                                if (diference.inDays > 4) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                    content: const Text(
+                                                      "Essa Classificação é muito antiga para ser excluida",
+                                                      style: TextStyle(
+                                                          color: textColor),
+                                                    ),
+                                                    backgroundColor:
+                                                        Theme.of(context)
+                                                            .colorScheme
+                                                            .error,
+                                                  ));
+                                                } else {
+                                                  _onConfirm(
+                                                      e.id,
+                                                      e.fruta.id,
+                                                      e.produtor.id,
+                                                      e.embalagem.id,
+                                                      e.quantidade);
+                                                }
                                                 setState(() {
                                                   _isloading = false;
                                                 });
@@ -121,6 +141,7 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
                                         columnData(
                                             '${e.fruta.nome} ${e.fruta.variedade}'),
                                         columnData(e.quantidade.toString()),
+                                        columnData(e.refugo.toString()),
                                         columnData(e.embalagem.nome),
                                         columnData(
                                             '${e.produtor.nome} ${e.produtor.sobrenome}'),
@@ -158,7 +179,7 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
   Future<void> _onConfirm(int id, int frutaId, int produtorId, int embalagemId,
       double quantidade) async {
     try {
-      await excluirEntradaSC(
+      await excluirClassifi(
           client, frutaId, produtorId, embalagemId, quantidade, id, context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

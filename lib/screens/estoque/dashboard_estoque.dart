@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/componetes_gerais/title_medium.dart';
 import 'package:maca_ipe/datas/estoque_lista.dart';
 import 'package:maca_ipe/screens/estoque/cabecalho_estoque.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -29,7 +30,7 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
   Future<List<EstoqueLista>> buscarEstoqueSC(
       SupabaseClient client, String tabela) async {
     final estoqueJson = await client.from(tabela).select(
-        'id, Fruta(Nome, Variedade), Embalagem(Nome), Quantidade, Produtor(Nome, Sobrenome)');
+        'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)');
 
     return parseEstoqueSC(estoqueJson);
   }
@@ -76,10 +77,8 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                           decoration: _isSCorC
                               ? const BoxDecoration(color: Colors.blue)
                               : const BoxDecoration(),
-                          child: Text(
-                            'Estoque Sc',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                          child: TitleMedium(
+                              context: context, title: "Estoque Sc"),
                         ),
                       ),
                       const SizedBox(
@@ -96,10 +95,8 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                           decoration: _isSCorC
                               ? const BoxDecoration()
                               : const BoxDecoration(color: Colors.blue),
-                          child: Text(
-                            'Estoque C',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                          child:
+                              TitleMedium(context: context, title: "Estoque C"),
                         ),
                       ),
                     ],
@@ -138,52 +135,27 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                                 )
                                 .toList();
                             return DataTable(
-                              columnSpacing: 16.0, // Espaçamento entre colunas
-                              dataRowHeight: 60.0, // Altura das linhas de dados
-                              headingRowHeight: 70.0,
-                              // Altura da linha de cabeçalho
+                              columnSpacing: 16.0,
+                              dataRowHeight: 60.0,
+                              headingRowHeight:
+                                  70.0, // Altura da linha de cabeçalho
                               dividerThickness:
                                   1.0, // Espessura da borda entre células
                               horizontalMargin: 20.0,
-                              // Margem horizontal interna
-                              columns: const [
-                                DataColumn(
-                                  label: Text(
-                                    'Fruta',
-                                    style: TextStyle(color: textColor),
-                                  ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Produtor',
-                                    style: TextStyle(color: textColor),
-                                  ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Embalagem',
-                                    style: TextStyle(color: textColor),
-                                  ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Quantidade',
-                                    style: TextStyle(color: textColor),
-                                  ),
-                                ),
+                              columns: [
+                                columnTable('Fruta'),
+                                columnTable('Produtor'),
+                                columnTable('Embalagem'),
+                                columnTable('Quantidade'),
                               ],
                               rows: estoqueSC.map((e) {
                                 return DataRow(cells: [
-                                  DataCell(Text(
-                                      '${e.fruta.nome} ${e.fruta.variedade}',
-                                      style: const TextStyle(fontSize: 16))),
-                                  DataCell(Text(
-                                      '${e.produtor.nome} ${e.produtor.sobrenome}',
-                                      style: const TextStyle(fontSize: 16))),
-                                  DataCell(Text(e.embalagem.nome,
-                                      style: const TextStyle(fontSize: 16))),
-                                  DataCell(Text(e.quantidade.toString(),
-                                      style: const TextStyle(fontSize: 16))),
+                                  columnData(
+                                      '${e.fruta.nome} ${e.fruta.variedade}'),
+                                  columnData(
+                                      '${e.produtor.nome} ${e.produtor.sobrenome}'),
+                                  columnData(e.embalagem.nome),
+                                  columnData(e.quantidade.toString()),
                                 ]);
                               }).toList(),
                             );
@@ -204,6 +176,19 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  DataCell columnData(String data) {
+    return DataCell(Text(data, style: const TextStyle(fontSize: 16)));
+  }
+
+  DataColumn columnTable(String title) {
+    return DataColumn(
+      label: Text(
+        title,
+        style: const TextStyle(color: textColor),
       ),
     );
   }

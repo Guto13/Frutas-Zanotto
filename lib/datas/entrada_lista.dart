@@ -1,4 +1,5 @@
 class EntradaLista {
+  final int id;
   final FrutaEntrada fruta;
   final EmbalagemEntrada embalagem;
   final ProdutorEntrada produtor;
@@ -6,7 +7,8 @@ class EntradaLista {
   final DateTime data;
 
   EntradaLista(
-      {required this.fruta,
+      {required this.id,
+        required this.fruta,
       required this.embalagem,
       required this.quantidade,
       required this.produtor,
@@ -14,6 +16,7 @@ class EntradaLista {
 
   factory EntradaLista.fromJson(Map<String, dynamic> json) {
     return EntradaLista(
+      id: json['id'],
       quantidade: json['Quantidade'],
       data: DateTime.parse(json['Data']),
       fruta: FrutaEntrada.fromJson(json['Fruta']),
@@ -26,14 +29,17 @@ class EntradaLista {
 class FrutaEntrada {
   String nome;
   String variedade;
+  int id;
 
   FrutaEntrada({
     required this.nome,
     required this.variedade,
+    required this.id,
   });
 
   factory FrutaEntrada.fromJson(Map<String, dynamic> json) {
     return FrutaEntrada(
+      id: json['id'],
       nome: json['Nome'],
       variedade: json['Variedade'],
     );
@@ -42,13 +48,16 @@ class FrutaEntrada {
 
 class EmbalagemEntrada {
   String nome;
+  int id;
 
   EmbalagemEntrada({
     required this.nome,
+    required this.id,
   });
 
   factory EmbalagemEntrada.fromJson(Map<String, dynamic> json) {
     return EmbalagemEntrada(
+      id: json['id'],
       nome: json['Nome'],
     );
   }
@@ -57,14 +66,17 @@ class EmbalagemEntrada {
 class ProdutorEntrada {
   String nome;
   String sobrenome;
+  int id;
 
   ProdutorEntrada({
     required this.nome,
     required this.sobrenome,
+    required this.id,
   });
 
   factory ProdutorEntrada.fromJson(Map<String, dynamic> json) {
     return ProdutorEntrada(
+      id: json['id'],
       nome: json['Nome'],
       sobrenome: json['Sobrenome'],
     );
