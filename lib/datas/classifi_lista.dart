@@ -6,6 +6,7 @@ class ClassifiLista {
   final double quantidade;
   final DateTime data;
   final double refugo;
+  final int romaneioId;
 
   ClassifiLista(
       {required this.id,
@@ -14,7 +15,8 @@ class ClassifiLista {
       required this.produtor,
       required this.quantidade,
       required this.data,
-      required this.refugo});
+      required this.refugo,
+      required this.romaneioId});
 
   factory ClassifiLista.fromJson(Map<String, dynamic> json) {
     return ClassifiLista(
@@ -25,6 +27,7 @@ class ClassifiLista {
       produtor: ProdutorEstoque.fromJson(json['Produtor']),
       data: DateTime.parse(json['Data']),
       refugo: json['Refugo'],
+      romaneioId: json['RomaneioId'],
     );
   }
 }

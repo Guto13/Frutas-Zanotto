@@ -22,7 +22,7 @@ class RomaneioCp {
   factory RomaneioCp.fromJson(Map<String, dynamic> json) {
     return RomaneioCp(
       id: json['id'],
-      romaneioId: json['RomaneioID'],
+      romaneioId: json['RomaneioId'],
       gg: json['GG'],
       g: json['G'],
       m: json['M'],
@@ -34,8 +34,7 @@ class RomaneioCp {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'RomaneioID': romaneioId,
+      'RomaneioId': romaneioId,
       'GG': gg,
       'G': g,
       'M': m,
@@ -44,4 +43,14 @@ class RomaneioCp {
       'Cat2': cat2,
     };
   }
+}
+
+class CalibreCp {
+  final String calibre;
+  final int quant;
+
+  CalibreCp({
+    required this.calibre,
+    required this.quant,
+  });
 }

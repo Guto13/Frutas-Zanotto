@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/screens/romaneio/lista_romaneios.dart';
 
 class CabecalhoRomaneio extends StatelessWidget {
   const CabecalhoRomaneio({Key? key}) : super(key: key);
@@ -26,7 +27,14 @@ class CabecalhoRomaneio extends StatelessWidget {
             ],
           )),
           const Spacer(),
-          BotaoPadrao(context: context, title: 'Romaneios', onPressed: () {}),
+          BotaoPadrao(
+            context: context,
+            title: 'Romaneios',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ListaRomaneios()),
+            ),
+          ),
         ],
       ),
     );

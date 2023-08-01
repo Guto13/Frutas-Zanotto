@@ -46,8 +46,11 @@ class _CadastroClassifiState extends State<CadastroClassifi> {
       MaskTextInputFormatter(mask: '##.##', filter: {"#": RegExp(r'[0-9]')});
 
   Future<List<EstoqueLista>> buscarEstoqueSC(SupabaseClient client) async {
-    final estoqueJson = await client.from('EstoqueSC').select(
-        'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)');
+    final estoqueJson = await client
+        .from('EstoqueSC')
+        .select(
+            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)')
+        .order('Quantidade');
     return parseEstoqueSC(estoqueJson);
   }
 
@@ -86,21 +89,28 @@ class _CadastroClassifiState extends State<CadastroClassifi> {
                       } else if (snapshot.hasData) {
                         estoqueSC = snapshot.data!;
                         estoqueSC = estoqueSC
-                            .where(
-                              (est) =>
-                                  est.fruta.nome.toLowerCase().contains(
-                                      widget.pesquisa.toLowerCase()) ||
-                                  est.produtor.nome.toLowerCase().contains(
-                                      widget.pesquisa.toLowerCase()) ||
-                                  est.produtor.sobrenome.toLowerCase().contains(
-                                      widget.pesquisa.toLowerCase()) ||
-                                  est.embalagem.nome.toLowerCase().contains(
-                                      widget.pesquisa.toLowerCase()) ||
-                                  est.fruta.variedade
-                                      .toLowerCase()
-                                      .contains(widget.pesquisa.toLowerCase()),
-                            )
+                            .where((est) =>
+                                est.fruta.nome
+                                    .toLowerCase()
+                                    .contains(widget.pesquisa.toLowerCase()) ||
+                                est.produtor.nome
+                                    .toLowerCase()
+                                    .contains(widget.pesquisa.toLowerCase()) ||
+                                est.produtor.sobrenome
+                                    .toLowerCase()
+                                    .contains(widget.pesquisa.toLowerCase()) ||
+                                est.embalagem.nome
+                                    .toLowerCase()
+                                    .contains(widget.pesquisa.toLowerCase()) ||
+                                est.fruta.variedade
+                                    .toLowerCase()
+                                    .contains(widget.pesquisa.toLowerCase()))
                             .toList();
+
+                        estoqueSC = estoqueSC
+                            .where((element) => element.quantidade > 0)
+                            .toList();
+
                         return SingleChildScrollView(
                           controller: _controllerOne,
                           child: Column(

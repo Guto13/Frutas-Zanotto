@@ -13,5 +13,6 @@ const Color iconColor = Colors.red;
 const defaultPadding = 16.0;
 const fontTitle = 20.0;
 const fontSubTitle = 16.0;
+const romaneioArea = 500.0;
 
 const maxWidthArea = 900;

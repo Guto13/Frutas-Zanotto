@@ -20,6 +20,7 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
   bool _isSCorC = true;
   String tabela = 'EstoqueSC';
   String _pesquisa = '';
+  bool _isChecked = false;
 
   void atualizarPesquisa(String novaPesquisa) {
     setState(() {
@@ -29,8 +30,11 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
 
   Future<List<EstoqueLista>> buscarEstoqueSC(
       SupabaseClient client, String tabela) async {
-    final estoqueJson = await client.from(tabela).select(
-        'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)');
+    final estoqueJson = await client
+        .from(tabela)
+        .select(
+            'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)')
+        .order('Quantidade');
 
     return parseEstoqueSC(estoqueJson);
   }
@@ -66,39 +70,66 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                 children: [
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _isSCorC = true;
-                            tabela = 'EstoqueSC';
-                          });
-                        },
-                        child: Container(
-                          decoration: _isSCorC
-                              ? const BoxDecoration(color: Colors.blue)
-                              : const BoxDecoration(),
-                          child: TitleMedium(
-                              context: context, title: "Estoque Sc"),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isSCorC = true;
+                                  tabela = 'EstoqueSC';
+                                });
+                              },
+                              child: Container(
+                                decoration: _isSCorC
+                                    ? const BoxDecoration(color: Colors.blue)
+                                    : const BoxDecoration(),
+                                child: TitleMedium(
+                                    context: context, title: "Estoque Sc"),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: defaultPadding * 2,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isSCorC = false;
+                                  tabela = 'EstoqueC';
+                                });
+                              },
+                              child: Container(
+                                decoration: _isSCorC
+                                    ? const BoxDecoration()
+                                    : const BoxDecoration(color: Colors.blue),
+                                child: TitleMedium(
+                                    context: context, title: "Estoque C"),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(
-                        width: defaultPadding * 2,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _isSCorC = false;
-                            tabela = 'EstoqueC';
-                          });
-                        },
-                        child: Container(
-                          decoration: _isSCorC
-                              ? const BoxDecoration()
-                              : const BoxDecoration(color: Colors.blue),
-                          child:
-                              TitleMedium(context: context, title: "Estoque C"),
-                        ),
-                      ),
+                      const Spacer(),
+                      Expanded(
+                          child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Expanded(
+                              child: TitleMedium(
+                                  title: 'Mostrar estoque negativo',
+                                  context: context)),
+                          Expanded(
+                            child: Checkbox(
+                              value: _isChecked,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _isChecked = value!;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ))
                     ],
                   ),
                   SizedBox(
@@ -134,6 +165,11 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                                           .contains(_pesquisa.toLowerCase()),
                                 )
                                 .toList();
+                            if (_isChecked == false) {
+                              estoqueSC = estoqueSC
+                                  .where((element) => element.quantidade > 0)
+                                  .toList();
+                            }
                             return DataTable(
                               columnSpacing: 16.0,
                               dataRowHeight: 60.0,

@@ -8,24 +8,23 @@ import 'package:maca_ipe/datas/embalagem.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/datas/romaneio.dart';
-import 'package:maca_ipe/datas/romaneio_m.dart';
+import 'package:maca_ipe/datas/romaneio_cp.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/screens/romaneio/card_romaneio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class RomaneioMDesktop extends StatefulWidget {
-  const RomaneioMDesktop({
-    Key? key,
-    required this.textControllers,
-  }) : super(key: key);
+class RomaneioCPDesktop extends StatefulWidget {
+  const RomaneioCPDesktop(
+      {Key? key, required this.textControllers, required this.frutaR})
+      : super(key: key);
 
   final List<TextEditingController> textControllers;
-
+  final String frutaR;
   @override
-  State<RomaneioMDesktop> createState() => _RomaneioMDesktopState();
+  State<RomaneioCPDesktop> createState() => _RomaneioCPDesktopState();
 }
 
-class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
+class _RomaneioCPDesktopState extends State<RomaneioCPDesktop> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   late List<Fruta> frutas;
@@ -42,7 +41,7 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
     final frutasJson = await client
         .from("Fruta")
         .select()
-        .eq('Nome', 'Maçã')
+        .eq('Nome', widget.frutaR)
         .order('Nome', ascending: true)
         .order('Variedade', ascending: true);
     return parseFrutas(frutasJson);
@@ -103,7 +102,7 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
                 : SizedBox(
                     width: double.infinity,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
                           width: const BoxConstraints().maxWidth / 3,
@@ -265,111 +264,37 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
                         const SizedBox(
                           height: defaultPadding,
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    'Cat1',
-                                    style: TextStyle(fontSize: fontTitle),
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[0],
-                                      name: '220'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[1],
-                                      name: '198'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[2],
-                                      name: '180'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[3],
-                                      name: '165'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[4],
-                                      name: '150'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[5],
-                                      name: '135'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[6],
-                                      name: '120'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[7],
-                                      name: '110'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[8],
-                                      name: '100'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[9],
-                                      name: '90'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[10],
-                                      name: '80'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[11],
-                                      name: '70'),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Cat2',
-                                    style: TextStyle(fontSize: fontTitle),
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[12],
-                                      name: '180'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[13],
-                                      name: '165'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[14],
-                                      name: '150'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[15],
-                                      name: '135'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[16],
-                                      name: '120'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[17],
-                                      name: '110'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[18],
-                                      name: '100'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[19],
-                                      name: '90'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[20],
-                                      name: '80'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[21],
-                                      name: '70'),
-                                  CardRomaneio(
-                                      controller: widget.textControllers[22],
-                                      name: 'Com'),
-                                ],
-                              ),
-                            ),
-                          ],
+                        const Text(
+                          'Preencha as quantidades abaixo',
+                          style: TextStyle(fontSize: fontTitle),
                         ),
+                        const SizedBox(height: defaultPadding),
+                        CardRomaneio(
+                            controller: widget.textControllers[0], name: 'GG'),
+                        CardRomaneio(
+                            controller: widget.textControllers[1], name: 'G'),
+                        CardRomaneio(
+                            controller: widget.textControllers[2], name: 'M'),
+                        CardRomaneio(
+                            controller: widget.textControllers[3], name: 'P'),
+                        CardRomaneio(
+                            controller: widget.textControllers[4], name: 'PP'),
+                        CardRomaneio(
+                            controller: widget.textControllers[5],
+                            name: 'Cat2'),
                         const SizedBox(height: defaultPadding),
                         BotaoPadrao(
                             context: context,
                             title: 'Salvar',
-                            onPressed: _salvar),
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _formKey.currentState!.save();
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                _salvar();
+                              }
+                            }),
                       ],
                     ),
                   ),
@@ -380,49 +305,25 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
   }
 
   Future<void> _salvar() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      setState(() {
-        _isLoading = true;
-      });
-    }
-
     Romaneio romaneio = Romaneio(
         id: 1,
         frutaId: _frutaSelecionada!.id,
         embalagemId: _embalagemSelecionada!.id,
-        tFruta: "RomaneioM",
+        tFruta: "RomaneioCP",
         data: DateTime.now(),
         produtorId: _produtorSelecionado!.id);
 
-    RomaneioM romaneioM = RomaneioM(
+    RomaneioCp romaneioCp = RomaneioCp(
         id: 1,
         romaneioId: 1,
-        c2201: int.tryParse(widget.textControllers[0].text) ?? 0,
-        c1981: int.tryParse(widget.textControllers[1].text) ?? 0,
-        c1801: int.tryParse(widget.textControllers[2].text) ?? 0,
-        c1651: int.tryParse(widget.textControllers[3].text) ?? 0,
-        c1501: int.tryParse(widget.textControllers[4].text) ?? 0,
-        c1351: int.tryParse(widget.textControllers[5].text) ?? 0,
-        c1201: int.tryParse(widget.textControllers[6].text) ?? 0,
-        c1101: int.tryParse(widget.textControllers[7].text) ?? 0,
-        c1001: int.tryParse(widget.textControllers[8].text) ?? 0,
-        c901: int.tryParse(widget.textControllers[9].text) ?? 0,
-        c801: int.tryParse(widget.textControllers[10].text) ?? 0,
-        c701: int.tryParse(widget.textControllers[11].text) ?? 0,
-        c1802: int.tryParse(widget.textControllers[12].text) ?? 0,
-        c1652: int.tryParse(widget.textControllers[13].text) ?? 0,
-        c1502: int.tryParse(widget.textControllers[14].text) ?? 0,
-        c1352: int.tryParse(widget.textControllers[15].text) ?? 0,
-        c1202: int.tryParse(widget.textControllers[16].text) ?? 0,
-        c1102: int.tryParse(widget.textControllers[17].text) ?? 0,
-        c1002: int.tryParse(widget.textControllers[18].text) ?? 0,
-        c902: int.tryParse(widget.textControllers[19].text) ?? 0,
-        c802: int.tryParse(widget.textControllers[20].text) ?? 0,
-        c702: int.tryParse(widget.textControllers[21].text) ?? 0,
-        comercial: int.tryParse(widget.textControllers[22].text) ?? 0);
+        gg: int.tryParse(widget.textControllers[0].text) ?? 0,
+        g: int.tryParse(widget.textControllers[1].text) ?? 0,
+        m: int.tryParse(widget.textControllers[2].text) ?? 0,
+        p: int.tryParse(widget.textControllers[3].text) ?? 0,
+        pp: int.tryParse(widget.textControllers[4].text) ?? 0,
+        cat2: int.tryParse(widget.textControllers[5].text) ?? 0);
 
-    await cadastrarRomaneioM(client, romaneio, romaneioM, context);
+    await cadastrarRomaneioCP(client, romaneio, romaneioCp, context);
 
     setState(() {
       _isLoading = false;

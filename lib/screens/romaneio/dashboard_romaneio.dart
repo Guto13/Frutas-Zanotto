@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/button_text_default.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/screens/romaneio/romaneio_cp/romaneio_cp_screen.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_m/romaneio_m_screen.dart';
+import 'package:maca_ipe/screens/romaneio/romaneio_pa/romaneio_pa_screen.dart';
 
 class DashboardRomaneio extends StatelessWidget {
   const DashboardRomaneio({
@@ -42,8 +44,43 @@ class DashboardRomaneio extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: ButtonTextDefault(
-                      title: 'Pêssego/ameixa',
-                      onPressed: () {},
+                      title: 'Pêssego',
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const RomaneioPAScreen(frutaR: "Pêssego")),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: defaultPadding * 2),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: ButtonTextDefault(
+                      title: 'Ameixa',
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const RomaneioPAScreen(frutaR: "Ameixa")),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: defaultPadding),
+                  Expanded(
+                    flex: 2,
+                    child: ButtonTextDefault(
+                      title: 'Caqui',
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const RomaneioCPScreen(frutaR: "Caqui")),
+                      ),
                     ),
                   ),
                 ],
@@ -55,7 +92,12 @@ class DashboardRomaneio extends StatelessWidget {
                     flex: 2,
                     child: ButtonTextDefault(
                       title: 'Pêra',
-                      onPressed: () {},
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const RomaneioCPScreen(frutaR: "Pêra")),
+                      ),
                     ),
                   ),
                   const SizedBox(width: defaultPadding),

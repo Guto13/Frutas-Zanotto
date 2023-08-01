@@ -112,3 +112,15 @@ class RomaneioM {
     };
   }
 }
+
+class CalibreM {
+  final String calibre;
+  final int cat1;
+  final int cat2;
+
+  CalibreM({
+    required this.calibre,
+    required this.cat1,
+    required this.cat2,
+  });
+}

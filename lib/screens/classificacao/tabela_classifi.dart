@@ -1,10 +1,12 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/alert.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/classifi_lista.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/screens/classificacao/classifi_romaneio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TabelaClassifi extends StatefulWidget {
@@ -23,7 +25,7 @@ class _TabelaClassifiState extends State<TabelaClassifi> {
     final classifisJson = await client
         .from('Classificacao')
         .select(
-            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome), Data, Refugo')
+            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome), Data, Refugo, RomaneioId')
         .order('Data');
 
     return parseClassifi(classifisJson);
@@ -85,6 +87,7 @@ class _TabelaClassifiState extends State<TabelaClassifi> {
                                   columnTable('Embalagem'),
                                   columnTable('Produtor'),
                                   columnTable('Data'),
+                                  columnTable('Romaneio'),
                                 ],
                                 rows: classifi.map((e) {
                                   return DataRow(
@@ -147,6 +150,16 @@ class _TabelaClassifiState extends State<TabelaClassifi> {
                                             '${e.produtor.nome} ${e.produtor.sobrenome}'),
                                         columnData(formatDate(
                                             e.data, [dd, '-', mm, '-', yyyy])),
+                                        columnIconBtn(() {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ClassifiRomaneio(
+                                                      classifi: e,
+                                                    )),
+                                          );
+                                        }, 'assets/icons/list.svg'),
                                       ]);
                                 }).toList(),
                               ),
@@ -166,6 +179,16 @@ class _TabelaClassifiState extends State<TabelaClassifi> {
 
   DataCell columnData(String data) {
     return DataCell(Text(data, style: const TextStyle(fontSize: 16)));
+  }
+
+  DataCell columnIconBtn(VoidCallback press, String icon) {
+    return DataCell(
+      SvgPicture.asset(
+        icon,
+        height: 25,
+      ),
+      onTap: press,
+    );
   }
 
   DataColumn columnTable(String title) {

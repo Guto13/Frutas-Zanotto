@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/estoque.dart';
 import 'package:maca_ipe/datas/romaneio.dart';
+import 'package:maca_ipe/datas/romaneio_cp.dart';
 import 'package:maca_ipe/datas/romaneio_m.dart';
+import 'package:maca_ipe/datas/romaneio_pa.dart';
 import 'package:supabase/supabase.dart';
 
 // Função para consultar o estoque
@@ -148,7 +150,7 @@ Future<void> excluirClassifi(
   );
 }
 
-// Função para lidar com o cadastro de novos romaneios
+// Função para lidar com o cadastro de novos romaneios de maçã
 Future<void> cadastrarRomaneioM(SupabaseClient supabase, Romaneio romaneio,
     RomaneioM romaneioM, BuildContext context) async {
   try {
@@ -183,6 +185,98 @@ Future<void> cadastrarRomaneioM(SupabaseClient supabase, Romaneio romaneio,
           comercial: romaneioM.comercial);
 
       await supabase.from('RomaneioM').insert(romaneiCad.toMap());
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+            style: const TextStyle(color: textColor),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+// Função para lidar com o cadastro de novos romaneios de Pêssego e Ameixa
+Future<void> cadastrarRomaneioPA(SupabaseClient supabase, Romaneio romaneio,
+    RomaneioPa romaneioPa, BuildContext context) async {
+  try {
+    final response =
+        await supabase.from('Romaneio').insert(romaneio.toMap()).select('id');
+    try {
+      RomaneioPa romaneiCad = RomaneioPa(
+          id: 1,
+          romaneioId: response[0]['id'],
+          c45: romaneioPa.c45,
+          c40: romaneioPa.c40,
+          c36: romaneioPa.c36,
+          c32: romaneioPa.c32,
+          c30: romaneioPa.c30,
+          c28: romaneioPa.c28,
+          c24: romaneioPa.c24,
+          c22: romaneioPa.c22,
+          c20: romaneioPa.c20,
+          c18: romaneioPa.c18,
+          c14: romaneioPa.c14,
+          c12: romaneioPa.c12,
+          cat2: romaneioPa.cat2);
+
+      await supabase.from('RomaneioPA').insert(romaneiCad.toMap());
+    } catch (e) {
+      //print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+            style: const TextStyle(color: textColor),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+// Função para lidar com o cadastro de novos romaneios de Pêssego e Ameixa
+Future<void> cadastrarRomaneioCP(SupabaseClient supabase, Romaneio romaneio,
+    RomaneioCp romaneioCp, BuildContext context) async {
+  try {
+    final response =
+        await supabase.from('Romaneio').insert(romaneio.toMap()).select('id');
+    try {
+      RomaneioCp romaneiCad = RomaneioCp(
+          id: 1,
+          romaneioId: response[0]['id'],
+          gg: romaneioCp.gg,
+          g: romaneioCp.g,
+          m: romaneioCp.m,
+          p: romaneioCp.p,
+          pp: romaneioCp.pp,
+          cat2: romaneioCp.cat2);
+
+      await supabase.from('RomaneioCP').insert(romaneiCad.toMap());
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

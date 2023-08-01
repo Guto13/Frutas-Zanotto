@@ -25,7 +25,7 @@ class ProdutoresScreen extends StatelessWidget {
                   Expanded(child: LeftMenu(client: client)),
                   const Expanded(
                     flex: 5,
-                    child: DashBoardProdutores(),
+                    child: DashboardProdutores(),
                   ),
                 ],
               ),
