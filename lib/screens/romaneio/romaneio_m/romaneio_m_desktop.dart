@@ -38,49 +38,6 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
 
   final client = Supabase.instance.client;
 
-  Future<List<Fruta>> fetchFrutas(SupabaseClient client) async {
-    final frutasJson = await client
-        .from("Fruta")
-        .select()
-        .eq('Nome', 'Maçã')
-        .order('Nome', ascending: true)
-        .order('Variedade', ascending: true);
-    return parseFrutas(frutasJson);
-  }
-
-  Future<List<Embalagem>> fetchEmbalagens(SupabaseClient client) async {
-    final embalagensJson =
-        await client.from("Embalagem").select().order('Nome', ascending: true);
-    return parseEmbalagem(embalagensJson);
-  }
-
-  Future<List<Produtor>> fetchProdutores(SupabaseClient client) async {
-    final produtoresJson = await client
-        .from("Produtor")
-        .select()
-        .order('Nome', ascending: true)
-        .order('Sobrenome', ascending: true);
-    return parseProdutor(produtoresJson);
-  }
-
-  List<Embalagem> parseEmbalagem(List<dynamic> responseBody) {
-    List<Embalagem> embalagemList =
-        responseBody.map((item) => Embalagem.fromJson(item)).toList();
-    return embalagemList;
-  }
-
-  List<Fruta> parseFrutas(List<dynamic> responseBody) {
-    List<Fruta> frutasList =
-        responseBody.map((item) => Fruta.fromJson(item)).toList();
-    return frutasList;
-  }
-
-  List<Produtor> parseProdutor(List<dynamic> responseBody) {
-    List<Produtor> produtorList =
-        responseBody.map((item) => Produtor.fromJson(item)).toList();
-    return produtorList;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -113,7 +70,7 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
                               Expanded(
                                 flex: 1,
                                 child: FutureBuilder<List<Fruta>>(
-                                    future: fetchFrutas(client),
+                                    future: fetchFrutas(client, 'Maçã', ''),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {

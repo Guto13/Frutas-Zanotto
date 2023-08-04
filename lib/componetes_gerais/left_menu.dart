@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/main.dart';
+import 'package:maca_ipe/screens/carga/carga_screen.dart';
 import 'package:maca_ipe/screens/classificacao/classificacao_screen.dart';
 import 'package:maca_ipe/screens/estoque/estoque_screen.dart';
 import 'package:maca_ipe/screens/home_page.dart';
+import 'package:maca_ipe/screens/paletes/paletes_screen.dart';
 import 'package:maca_ipe/screens/produtores/produtores_screen.dart';
 import 'package:maca_ipe/screens/produtos/Frutas/frutas_screen.dart';
 import 'package:maca_ipe/screens/produtos/embalagens/embalagens_screen.dart';
@@ -88,11 +90,20 @@ class LeftMenu extends StatelessWidget {
               ),
             ),
             MenuButton(
-                title: 'Paletes', icon: 'assets/icons/truck.svg', press: () {}),
+              title: 'Paletes',
+              icon: 'assets/icons/paletes.svg',
+              press: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PaletesScreen()),
+              ),
+            ),
             MenuButton(
               title: 'Carga',
               icon: 'assets/icons/truck.svg',
-              press: () {},
+              press: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CargaScreen()),
+              ),
             ),
             MenuButton(
               title: 'Sair',

@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      scrollBehavior: MyCustomScrollBehavior(),
+        scrollBehavior: MyCustomScrollBehavior(),
         title: 'Minha Firma',
         theme: ThemeData(
           scaffoldBackgroundColor: bgColor.withOpacity(0.9),
@@ -180,11 +180,11 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
- // Override behavior methods and getters like dragDevices
- @override
- Set<PointerDeviceKind> get dragDevices => {
-   PointerDeviceKind.touch,
-   PointerDeviceKind.mouse,
-   // etc.
- };
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        // etc.
+      };
 }

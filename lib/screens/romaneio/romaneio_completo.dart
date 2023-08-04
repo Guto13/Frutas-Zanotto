@@ -71,7 +71,7 @@ class _RomaneioCompletoState extends State<RomaneioCompleto> {
               r.c901 +
               r.c801 +
               r.c701,
-          cat2: r.c1801 +
+          cat2: r.c1802 +
               r.c1652 +
               r.c1502 +
               r.c1352 +

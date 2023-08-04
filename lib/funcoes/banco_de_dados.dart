@@ -2,7 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/datas/carga.dart';
+import 'package:maca_ipe/datas/embalagem.dart';
 import 'package:maca_ipe/datas/estoque.dart';
+import 'package:maca_ipe/datas/fruta.dart';
+import 'package:maca_ipe/datas/palete.dart';
+import 'package:maca_ipe/datas/palete_cp.dart';
+import 'package:maca_ipe/datas/palete_m.dart';
+import 'package:maca_ipe/datas/palete_o.dart';
+import 'package:maca_ipe/datas/palete_pa.dart';
+import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/datas/romaneio.dart';
 import 'package:maca_ipe/datas/romaneio_cp.dart';
 import 'package:maca_ipe/datas/romaneio_m.dart';
@@ -299,4 +308,141 @@ Future<void> cadastrarRomaneioCP(SupabaseClient supabase, Romaneio romaneio,
       ),
     );
   }
+}
+
+//Ajustando Frutas, Produtores e Embalagens para listar
+Future<List<Fruta>> fetchFrutas(
+    SupabaseClient client, String fruta, String fruta2) async {
+  final frutasJson = await client
+      .from("Fruta")
+      .select()
+      .or('Nome.eq.$fruta,Nome.eq.$fruta2')
+      .order('Nome', ascending: true)
+      .order('Variedade', ascending: true);
+  return parseFrutas(frutasJson);
+}
+
+Future<List<Produtor>> fetchProdutores(SupabaseClient client) async {
+  final produtoresJson = await client
+      .from("Produtor")
+      .select()
+      .order('Nome', ascending: true)
+      .order('Sobrenome', ascending: true);
+  return parseProdutor(produtoresJson);
+}
+
+Future<List<Embalagem>> fetchEmbalagens(SupabaseClient client) async {
+  final embalagensJson =
+      await client.from("Embalagem").select().order('Nome', ascending: true);
+  return parseEmbalagem(embalagensJson);
+}
+
+List<Embalagem> parseEmbalagem(List<dynamic> responseBody) {
+  List<Embalagem> embalagemList =
+      responseBody.map((item) => Embalagem.fromJson(item)).toList();
+  return embalagemList;
+}
+
+List<Fruta> parseFrutas(List<dynamic> responseBody) {
+  List<Fruta> frutasList =
+      responseBody.map((item) => Fruta.fromJson(item)).toList();
+  return frutasList;
+}
+
+List<Produtor> parseProdutor(List<dynamic> responseBody) {
+  List<Produtor> produtorList =
+      responseBody.map((item) => Produtor.fromJson(item)).toList();
+  return produtorList;
+}
+
+//Cadastro novos paletes
+Future<void> cadastroPaleteM(
+    SupabaseClient supabase, PaleteM palete, BuildContext context) async {
+  try {
+    await supabase.from('PaleteM').insert(palete.toMap());
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+Future<void> cadastroPaleteCP(
+    SupabaseClient supabase, PaleteCP palete, BuildContext context) async {
+  try {
+    await supabase.from('PaleteCP').insert(palete.toMap());
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+Future<void> cadastroPaletePA(
+    SupabaseClient supabase, PaletePA palete, BuildContext context) async {
+  try {
+    await supabase.from('PaletePA').insert(palete.toMap());
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+Future<void> cadastroPaleteO(
+    SupabaseClient supabase, PaleteO palete, BuildContext context) async {
+  try {
+    await supabase.from('PaleteO').insert(palete.toMap());
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+//Buscando paletes
+Future<List<Palete>> buscarPaletes(SupabaseClient client) async {
+  final paleteJson = await client.from('Palete').select().order('Data');
+  return parsePaleteJson(paleteJson);
+}
+
+List<Palete> parsePaleteJson(List<dynamic> responseBody) {
+  List<Palete> palete = responseBody.map((e) => Palete.fromJson(e)).toList();
+  return palete;
+}
+
+
+//Buscando cargas
+Future<List<Carga>> buscarCargas(SupabaseClient client) async {
+  final cargaJson = await client.from('Carga').select().order('Data');
+  return parseCargaJson(cargaJson);
+}
+
+List<Carga> parseCargaJson(List<dynamic> responseBody) {
+  List<Carga> carga = responseBody.map((e) => Carga.fromJson(e)).toList();
+  return carga;
 }
