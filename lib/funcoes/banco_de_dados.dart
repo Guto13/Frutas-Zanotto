@@ -425,8 +425,27 @@ Future<void> cadastroPaleteO(
 }
 
 //Buscando paletes
-Future<List<Palete>> buscarPaletes(SupabaseClient client) async {
-  final paleteJson = await client.from('Palete').select().order('Data');
+Future<List<Palete>> buscarPaletesNCarregados(
+    SupabaseClient client, bool carregado) async {
+  final paleteJson = await client
+      .from('Palete')
+      .select()
+      .eq('Carregado', carregado)
+      .order('Data', ascending: true);
+  return parsePaleteJson(paleteJson);
+}
+
+Future<List<Palete>> buscarPaletes(
+  SupabaseClient client,
+) async {
+  final paleteJson =
+      await client.from('Palete').select().order('Data', ascending: true);
+  return parsePaleteJson(paleteJson);
+}
+
+Future<List<Palete>> buscarPaletesPelaCarga(
+    SupabaseClient client, int carga) async {
+  final paleteJson = await client.from('Palete').select().eq('Carga', carga);
   return parsePaleteJson(paleteJson);
 }
 
@@ -434,7 +453,6 @@ List<Palete> parsePaleteJson(List<dynamic> responseBody) {
   List<Palete> palete = responseBody.map((e) => Palete.fromJson(e)).toList();
   return palete;
 }
-
 
 //Buscando cargas
 Future<List<Carga>> buscarCargas(SupabaseClient client) async {

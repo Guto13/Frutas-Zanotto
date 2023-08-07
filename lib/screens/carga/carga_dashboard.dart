@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/carga.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/screens/carga/carga_completa.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CargaDashboard extends StatefulWidget {
@@ -59,7 +60,15 @@ class _CargaDashboardState extends State<CargaDashboard> {
                         columnData(formatDate(e.data, [dd, '-', mm, '-', yyyy]),
                             e.id.toString()),
                         columnData(e.motorista.toString(), e.id.toString()),
-                        columnIconBtn(() {}, 'assets/icons/list.svg'),
+                        columnIconBtn(
+                            () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CargaCompleta(
+                                            carga: e,
+                                          )),
+                                ),
+                            'assets/icons/list.svg'),
                       ]);
                     }).toList(),
                   );

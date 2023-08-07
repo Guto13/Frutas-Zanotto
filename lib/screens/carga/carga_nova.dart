@@ -43,7 +43,7 @@ class _CargaNovaState extends State<CargaNova> {
                 SizedBox(
                   width: double.infinity,
                   child: FutureBuilder<List<Palete>>(
-                      future: buscarPaletes(client),
+                      future: buscarPaletesNCarregados(client, false),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -85,7 +85,8 @@ class _CargaNovaState extends State<CargaNova> {
                                         });
                                       } else {
                                         setState(() {
-                                          paletesSelecionados.remove(e);
+                                          paletesSelecionados.removeWhere(
+                                              (element) => element.id == e.id);
                                           selectedMap[e.id] = value;
                                         });
                                       }

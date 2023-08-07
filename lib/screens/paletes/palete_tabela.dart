@@ -1,5 +1,6 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/componetes_gerais/text_bold_normal.dart';
@@ -190,6 +191,10 @@ class _PaleteTabelaState extends State<PaleteTabela> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: (){}, child: SvgPicture.asset(
+        'assets/icons/pdf.svg',
+        height: 25,
+      ),),
       backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Palete completo'),
       body: SingleChildScrollView(
