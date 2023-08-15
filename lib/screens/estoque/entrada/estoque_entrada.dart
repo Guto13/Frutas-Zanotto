@@ -15,6 +15,9 @@ import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/screens/estoque/entrada/tabela_entradas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../componetes_gerais/future_drop_embalagem.dart';
+import '../../../componetes_gerais/future_drop_fruta.dart';
+
 class EntradaEstoque extends StatefulWidget {
   const EntradaEstoque({Key? key}) : super(key: key);
 
@@ -27,16 +30,25 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
   bool _isLoading = false;
   DateTime _data = DateTime.now();
   final _quant = TextEditingController();
-  late List<Fruta> frutas;
-  late List<Embalagem> embalagens;
   late List<Produtor> produtores;
-  
 
   Fruta? _frutaSelecionada;
   Embalagem? _embalagemSelecionada;
   Produtor? _produtorSelecionado;
 
   final client = Supabase.instance.client;
+
+  void handleFrutaSelected(Fruta fruta) {
+    setState(() {
+      _frutaSelecionada = fruta;
+    });
+  }
+
+  void handleEmbalSelected(Embalagem embalagem) {
+    setState(() {
+      _embalagemSelecionada = embalagem;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,88 +114,22 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                                       children: [
                                         Expanded(
                                           flex: 1,
-                                          child: FutureBuilder<List<Fruta>>(
-                                              future: fetchFrutas(client,'',''),
-                                              builder: (context, snapshot) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                } else if (snapshot.hasError) {
-                                                  return Center(
-                                                    child: Text(
-                                                        'Error: ${snapshot.error}'),
-                                                  );
-                                                } else {
-                                                  frutas = snapshot.data!;
-                                                  return DropdownButton<Fruta>(
-                                                    hint: const Text(
-                                                        "Selecione uma Fruta"),
-                                                    items: frutas
-                                                        .map((Fruta fruta) {
-                                                      return DropdownMenuItem<
-                                                          Fruta>(
-                                                        value: fruta,
-                                                        child: Text(fruta
-                                                            .nomeVariedade),
-                                                      );
-                                                    }).toList(),
-                                                    onChanged: (Fruta? value) {
-                                                      setState(() {
-                                                        _frutaSelecionada =
-                                                            value!;
-                                                      });
-                                                    },
-                                                  );
-                                                }
-                                              }),
+                                          child: FutureDropFruta(
+                                            client: client,
+                                            onFrutaSelected:
+                                                handleFrutaSelected,
+                                          ),
                                         ),
                                         const SizedBox(
                                           width: defaultPadding * 2,
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: FutureBuilder<List<Embalagem>>(
-                                              future: fetchEmbalagens(client),
-                                              builder: (context, snapshot) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                } else if (snapshot.hasError) {
-                                                  return Center(
-                                                    child: Text(
-                                                        'Error: ${snapshot.error}'),
-                                                  );
-                                                } else {
-                                                  embalagens = snapshot.data!;
-                                                  return DropdownButton<
-                                                      Embalagem>(
-                                                    hint: const Text(
-                                                        "Selecione uma Embalagem"),
-                                                    items: embalagens.map(
-                                                        (Embalagem embalagem) {
-                                                      return DropdownMenuItem<
-                                                          Embalagem>(
-                                                        value: embalagem,
-                                                        child: Text(
-                                                            embalagem.nomePeso),
-                                                      );
-                                                    }).toList(),
-                                                    onChanged:
-                                                        (Embalagem? value) {
-                                                      setState(() {
-                                                        _embalagemSelecionada =
-                                                            value;
-                                                      });
-                                                    },
-                                                  );
-                                                }
-                                              }),
+                                          child: FutureDropEmbalagem(
+                                            client: client,
+                                            onEmbalagemSelected:
+                                                handleEmbalSelected,
+                                          ),
                                         ),
                                         const SizedBox(
                                           width: defaultPadding * 2,

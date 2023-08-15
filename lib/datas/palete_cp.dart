@@ -1,5 +1,6 @@
 class PaleteCP {
   final int id;
+  final String table;
   final int frutaId;
   final int embalagemId;
   final int paleteId;
@@ -12,6 +13,7 @@ class PaleteCP {
 
   PaleteCP({
     required this.id,
+    this.table = 'PaleteCP',
     required this.frutaId,
     required this.embalagemId,
     required this.paleteId,
@@ -26,6 +28,7 @@ class PaleteCP {
   factory PaleteCP.fromJson(Map<String, dynamic> json) {
     return PaleteCP(
       id: json['id'],
+      table: json['Table'],
       frutaId: json['FrutaId'],
       embalagemId: json['EmbalagemId'],
       paleteId: json['PaleteId'],
@@ -41,7 +44,7 @@ class PaleteCP {
   Map<String, dynamic> toMap() {
     return {
       'FrutaId': frutaId,
-      'EmbalagemId':embalagemId,
+      'EmbalagemId': embalagemId,
       'PaleteId': paleteId,
       'GG': gg,
       'G': g,

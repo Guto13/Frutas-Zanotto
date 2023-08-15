@@ -6,6 +6,7 @@ import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/fruta.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddFrutas extends StatefulWidget {
@@ -58,49 +59,31 @@ class _AddFrutasState extends State<AddFrutas> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 SizedBox(
-                                  width: const BoxConstraints().maxWidth / 3,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: TextFormField(
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'[0-9]')),
-                                          ],
-                                          decoration: const InputDecoration(
-                                            labelText: 'Identificador',
-                                          ),
-                                          validator: (value) {
-                                            if (value?.isEmpty ?? true) {
-                                              return 'Por favor, preencha este campo';
-                                            }
-                                            return null;
-                                          },
-                                          onSaved: (value) => _id = value!,
-                                        ),
-                                      ),
-                                      const SizedBox(width: defaultPadding),
-                                      Expanded(
-                                        flex: 4,
-                                        child: TextFormField(
-                                          decoration: const InputDecoration(
-                                            labelText: 'Nome',
-                                          ),
-                                          validator: (value) {
-                                            if (value?.isEmpty ?? true) {
-                                              return 'Por favor, preencha este campo';
-                                            }
-                                            return null;
-                                          },
-                                          onSaved: (value) => _nome = value!,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                    width: const BoxConstraints().maxWidth / 3,
+                                    child: Responsive.isDesktop(context)
+                                        ? Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: fieldId(),
+                                              ),
+                                              const SizedBox(
+                                                  width: defaultPadding),
+                                              Expanded(
+                                                flex: 4,
+                                                child: fieldName(),
+                                              ),
+                                            ],
+                                          )
+                                        : Column(
+                                            children: [
+                                              fieldId(),
+                                              const SizedBox(
+                                                  height: defaultPadding),
+                                              fieldName(),
+                                            ],
+                                          )),
                                 const SizedBox(height: 10.0),
                                 TextFormField(
                                   decoration: const InputDecoration(
@@ -128,6 +111,40 @@ class _AddFrutasState extends State<AddFrutas> {
                     ),
                   ),
                 )),
+    );
+  }
+
+  TextFormField fieldName() {
+    return TextFormField(
+      decoration: const InputDecoration(
+        labelText: 'Nome',
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'Por favor, preencha este campo';
+        }
+        return null;
+      },
+      onSaved: (value) => _nome = value!,
+    );
+  }
+
+  TextFormField fieldId() {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+      ],
+      decoration: const InputDecoration(
+        labelText: 'Identificador',
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'Por favor, preencha este campo';
+        }
+        return null;
+      },
+      onSaved: (value) => _id = value!,
     );
   }
 

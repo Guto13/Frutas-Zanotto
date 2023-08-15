@@ -8,9 +8,12 @@ import 'package:maca_ipe/datas/estoque.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/datas/palete.dart';
 import 'package:maca_ipe/datas/palete_cp.dart';
+import 'package:maca_ipe/datas/palete_cp_lista.dart';
 import 'package:maca_ipe/datas/palete_m.dart';
+import 'package:maca_ipe/datas/palete_m_lista.dart';
 import 'package:maca_ipe/datas/palete_o.dart';
 import 'package:maca_ipe/datas/palete_pa.dart';
+import 'package:maca_ipe/datas/palete_pa_lista.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/datas/romaneio.dart';
 import 'package:maca_ipe/datas/romaneio_cp.dart';
@@ -313,10 +316,23 @@ Future<void> cadastrarRomaneioCP(SupabaseClient supabase, Romaneio romaneio,
 //Ajustando Frutas, Produtores e Embalagens para listar
 Future<List<Fruta>> fetchFrutas(
     SupabaseClient client, String fruta, String fruta2) async {
+  if (fruta.isEmpty) {
+    return fetchFrutasPadra(client);
+  } else {
+    final frutasJson = await client
+        .from("Fruta")
+        .select()
+        .or('Nome.eq.$fruta,Nome.eq.$fruta2')
+        .order('Nome', ascending: true)
+        .order('Variedade', ascending: true);
+    return parseFrutas(frutasJson);
+  }
+}
+
+Future<List<Fruta>> fetchFrutasPadra(SupabaseClient client) async {
   final frutasJson = await client
       .from("Fruta")
       .select()
-      .or('Nome.eq.$fruta,Nome.eq.$fruta2')
       .order('Nome', ascending: true)
       .order('Variedade', ascending: true);
   return parseFrutas(frutasJson);
@@ -443,6 +459,12 @@ Future<List<Palete>> buscarPaletes(
   return parsePaleteJson(paleteJson);
 }
 
+Future<List<Palete>> buscarPaleteId(SupabaseClient client, int id) async {
+  final List<dynamic> paleteJson =
+      await client.from('Palete').select().eq('id', id);
+  return paleteJson.map((e) => Palete.fromJson(e)).toList();
+}
+
 Future<List<Palete>> buscarPaletesPelaCarga(
     SupabaseClient client, int carga) async {
   final paleteJson = await client.from('Palete').select().eq('Carga', carga);
@@ -463,4 +485,160 @@ Future<List<Carga>> buscarCargas(SupabaseClient client) async {
 List<Carga> parseCargaJson(List<dynamic> responseBody) {
   List<Carga> carga = responseBody.map((e) => Carga.fromJson(e)).toList();
   return carga;
+}
+
+//recebendo dados para palete m
+Future<List<PaleteMLista>> buscarPaleteM(SupabaseClient client, int id) async {
+  final paleteMJson = await client
+      .from('PaleteM')
+      .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
+      .eq('PaleteId', id);
+
+  return parsePaleteMJson(paleteMJson);
+}
+
+List<PaleteMLista> parsePaleteMJson(List<dynamic> responseBody) {
+  List<PaleteMLista> paleteM =
+      responseBody.map((e) => PaleteMLista.fromJson(e)).toList();
+  return paleteM;
+}
+
+List<CalibreM> parseCalibreM(PaleteMLista r) {
+  List<CalibreM> calibrem = [
+    CalibreM(calibre: '220', cat1: r.c2201, cat2: 0),
+    CalibreM(calibre: '198', cat1: r.c1981, cat2: 0),
+    CalibreM(calibre: '180', cat1: r.c1801, cat2: r.c1802),
+    CalibreM(calibre: '165', cat1: r.c1651, cat2: r.c1652),
+    CalibreM(calibre: '150', cat1: r.c1501, cat2: r.c1502),
+    CalibreM(calibre: '135', cat1: r.c1351, cat2: r.c1352),
+    CalibreM(calibre: '120', cat1: r.c1201, cat2: r.c1202),
+    CalibreM(calibre: '110', cat1: r.c1101, cat2: r.c1102),
+    CalibreM(calibre: '100', cat1: r.c1001, cat2: r.c1002),
+    CalibreM(calibre: '90', cat1: r.c901, cat2: r.c902),
+    CalibreM(calibre: '80', cat1: r.c801, cat2: r.c802),
+    CalibreM(calibre: '70', cat1: r.c701, cat2: r.c702),
+    CalibreM(calibre: 'Comercial', cat1: 0, cat2: r.comercial),
+    CalibreM(
+        calibre: 'Total',
+        cat1: r.c2201 +
+            r.c1981 +
+            r.c1801 +
+            r.c1651 +
+            r.c1501 +
+            r.c1351 +
+            r.c1201 +
+            r.c1101 +
+            r.c1001 +
+            r.c901 +
+            r.c801 +
+            r.c701,
+        cat2: r.c1802 +
+            r.c1652 +
+            r.c1502 +
+            r.c1352 +
+            r.c1202 +
+            r.c1102 +
+            r.c1002 +
+            r.c902 +
+            r.c802 +
+            r.c702 +
+            r.comercial),
+  ];
+  return calibrem;
+}
+
+//recebendo dados para palete CP
+
+Future<List<PaleteCpLista>> buscarPaleteCP(
+    SupabaseClient client, int id) async {
+  final paleteCPJson = await client
+      .from('PaleteCP')
+      .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
+      .eq('PaleteId', id);
+
+  return parsePaleteCPJson(paleteCPJson);
+}
+
+List<PaleteCpLista> parsePaleteCPJson(List<dynamic> responseBody) {
+  List<PaleteCpLista> paleteCP =
+      responseBody.map((e) => PaleteCpLista.fromJson(e)).toList();
+  return paleteCP;
+}
+
+List<CalibreCp> parseCalibreCp(PaleteCpLista rcp) {
+  List<CalibreCp> calibrecp = [
+    CalibreCp(calibre: 'GG', quant: rcp.gg),
+    CalibreCp(calibre: 'G', quant: rcp.g),
+    CalibreCp(calibre: 'M', quant: rcp.m),
+    CalibreCp(calibre: 'P', quant: rcp.p),
+    CalibreCp(calibre: 'PP', quant: rcp.pp),
+    CalibreCp(calibre: 'Cat 2', quant: rcp.cat2),
+    CalibreCp(
+        calibre: 'Total',
+        quant: rcp.gg + rcp.g + rcp.m + rcp.p + rcp.pp + rcp.cat2),
+  ];
+  return calibrecp;
+}
+
+//recebendo dados para palete PA
+Future<List<PaletePALista>> buscarPaletePA(
+    SupabaseClient client, int id) async {
+  final paletePAJson = await client
+      .from('PaletePA')
+      .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
+      .eq('PaleteId', id);
+
+  return parsePaletePAJson(paletePAJson);
+}
+
+List<PaletePALista> parsePaletePAJson(List<dynamic> responseBody) {
+  List<PaletePALista> paletePA =
+      responseBody.map((e) => PaletePALista.fromJson(e)).toList();
+  return paletePA;
+}
+
+List<CalibreCp> parseCalibrePa(PaletePALista rpa) {
+  List<CalibreCp> calibrecp = [
+    CalibreCp(calibre: 'Granel', quant: rpa.c45),
+    CalibreCp(calibre: '40', quant: rpa.c40),
+    CalibreCp(calibre: '36', quant: rpa.c36),
+    CalibreCp(calibre: '32', quant: rpa.c32),
+    CalibreCp(calibre: '30', quant: rpa.c30),
+    CalibreCp(calibre: '28', quant: rpa.c28),
+    CalibreCp(calibre: '24', quant: rpa.c24),
+    CalibreCp(calibre: '22', quant: rpa.c22),
+    CalibreCp(calibre: '20', quant: rpa.c20),
+    CalibreCp(calibre: '18', quant: rpa.c18),
+    CalibreCp(calibre: '14', quant: rpa.c14),
+    CalibreCp(calibre: '12', quant: rpa.c12),
+    CalibreCp(calibre: 'Cat 2', quant: rpa.cat2),
+    CalibreCp(
+        calibre: 'Total',
+        quant: rpa.c45 +
+            rpa.c40 +
+            rpa.c36 +
+            rpa.c32 +
+            rpa.c30 +
+            rpa.c28 +
+            rpa.c24 +
+            rpa.c22 +
+            rpa.c20 +
+            rpa.c18 +
+            rpa.c14 +
+            rpa.c12 +
+            rpa.cat2),
+  ];
+  return calibrecp;
+}
+
+//recebendo dados para palete O
+Future<List<PaleteO>> buscarPaleteO(SupabaseClient client, int id) async {
+  final paleteOJson = await client.from('PaleteO').select().eq('PaleteId', id);
+
+  return parsePaleteOJson(paleteOJson);
+}
+
+List<PaleteO> parsePaleteOJson(List<dynamic> responseBody) {
+  List<PaleteO> paleteO = responseBody.map((e) => PaleteO.fromJson(e)).toList();
+  return paleteO;
 }

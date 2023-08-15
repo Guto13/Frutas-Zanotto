@@ -6,8 +6,10 @@ import 'package:maca_ipe/screens/produtores/edit_produtores.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashboardProdutores extends StatefulWidget {
-  const DashboardProdutores({Key? key}) : super(key: key);
+  const DashboardProdutores({Key? key, required this.keyProdutores})
+      : super(key: key);
 
+  final GlobalKey<ScaffoldState> keyProdutores;
   @override
   State<DashboardProdutores> createState() => _DashboardProdutoresState();
 }
@@ -15,7 +17,13 @@ class DashboardProdutores extends StatefulWidget {
 class _DashboardProdutoresState extends State<DashboardProdutores> {
   final client = Supabase.instance.client;
   List<Produtor> produtores = [];
-  //String _pesquisa = '';
+  String _pesquisa = '';
+
+  void atualizarPesquisa(String novaPesquisa) {
+    setState(() {
+      _pesquisa = novaPesquisa;
+    });
+  }
 
   Future<List<Produtor>> buscarProdutores(SupabaseClient client) async {
     final produtoresJson =
@@ -37,7 +45,10 @@ class _DashboardProdutoresState extends State<DashboardProdutores> {
       padding: const EdgeInsets.all(defaultPadding),
       child: Column(
         children: [
-          const CabecalhoProdutores(),
+          CabecalhoProdutores(
+            onSearch: atualizarPesquisa,
+            keyProdutores: widget.keyProdutores,
+          ),
           const SizedBox(height: defaultPadding),
           Container(
             padding: const EdgeInsets.all(defaultPadding),
@@ -58,6 +69,14 @@ class _DashboardProdutoresState extends State<DashboardProdutores> {
                       );
                     } else if (snapshot.hasData) {
                       produtores = snapshot.data!;
+
+                      produtores = produtores
+                          .where(
+                            (ele) => ele.nomeCompleto
+                                .toLowerCase()
+                                .contains(_pesquisa.toLowerCase()),
+                          )
+                          .toList();
 
                       return DataTable(
                         columnSpacing: 16.0,
@@ -104,18 +123,5 @@ class _DashboardProdutoresState extends State<DashboardProdutores> {
         ],
       ),
     ));
-  }
-
-  DataCell columnData(String data) {
-    return DataCell(Text(data, style: const TextStyle(fontSize: 16)));
-  }
-
-  DataColumn columnTable(String title) {
-    return DataColumn(
-      label: Text(
-        title,
-        style: const TextStyle(color: textColor),
-      ),
-    );
   }
 }

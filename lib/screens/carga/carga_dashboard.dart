@@ -1,6 +1,5 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/carga.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
@@ -56,10 +55,10 @@ class _CargaDashboardState extends State<CargaDashboard> {
                     ],
                     rows: cargaLista.map((e) {
                       return DataRow(cells: [
-                        columnData(e.id.toString(), e.id.toString()),
+                        columnData(e.id.toString(), message: e.id.toString()),
                         columnData(formatDate(e.data, [dd, '-', mm, '-', yyyy]),
-                            e.id.toString()),
-                        columnData(e.motorista.toString(), e.id.toString()),
+                           message: e.id.toString()),
+                        columnData(e.motorista.toString(), message: e.id.toString()),
                         columnIconBtn(
                             () => Navigator.push(
                                   context,
@@ -85,31 +84,6 @@ class _CargaDashboardState extends State<CargaDashboard> {
               }),
         ),
       ),
-    );
-  }
-
-  DataCell columnData(String data, String message) {
-    return DataCell(Tooltip(
-        message: message,
-        child: Text(data, style: const TextStyle(fontSize: 16))));
-  }
-
-  DataColumn columnTable(String title) {
-    return DataColumn(
-      label: Text(
-        title,
-        style: const TextStyle(color: textColor),
-      ),
-    );
-  }
-
-  DataCell columnIconBtn(VoidCallback press, String icon) {
-    return DataCell(
-      SvgPicture.asset(
-        icon,
-        height: 25,
-      ),
-      onTap: press,
     );
   }
 }

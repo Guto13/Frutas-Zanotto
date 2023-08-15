@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 const Color primaryColor = Colors.green; // Verde
 const Color secondaryColor = Color(0xFFADFF2F); // Verde claro
@@ -16,3 +17,28 @@ const fontSubTitle = 16.0;
 const romaneioArea = 500.0;
 
 const maxWidthArea = 900;
+
+DataCell columnData(String data, {String message = ''}) {
+  return DataCell(Tooltip(
+      message: message,
+      child: Text(data, style: const TextStyle(fontSize: 16))));
+}
+
+DataColumn columnTable(String title) {
+  return DataColumn(
+    label: Text(
+      title,
+      style: const TextStyle(color: textColor),
+    ),
+  );
+}
+
+DataCell columnIconBtn(VoidCallback press, String icon) {
+  return DataCell(
+    SvgPicture.asset(
+      icon,
+      height: 25,
+    ),
+    onTap: press,
+  );
+}

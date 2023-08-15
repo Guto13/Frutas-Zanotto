@@ -376,20 +376,6 @@ class _CadastroClassifiState extends State<CadastroClassifi> {
   String removeNonDigits(String text) {
     return text.replaceAll(RegExp(r'\D'), '');
   }
-
-  DataCell columnData(String data) {
-    return DataCell(Text(data, style: const TextStyle(fontSize: 16)));
-  }
-
-  DataColumn columnTable(String title) {
-    return DataColumn(
-      label: Text(
-        title,
-        style: const TextStyle(color: textColor),
-      ),
-    );
-  }
-
   Future<void> _salvar() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();

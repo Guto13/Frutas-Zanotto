@@ -6,9 +6,10 @@ import 'package:maca_ipe/screens/produtos/embalagens/edit_embalagens.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashBoardEmbalagens extends StatefulWidget {
-  const DashBoardEmbalagens({
-    Key? key,
-  }) : super(key: key);
+  const DashBoardEmbalagens({Key? key, required this.keyEmbalagens})
+      : super(key: key);
+
+  final GlobalKey<ScaffoldState> keyEmbalagens;
 
   @override
   State<DashBoardEmbalagens> createState() => _DashBoardEmbalagensState();
@@ -17,7 +18,13 @@ class DashBoardEmbalagens extends StatefulWidget {
 class _DashBoardEmbalagensState extends State<DashBoardEmbalagens> {
   final client = Supabase.instance.client;
   List<Embalagem> embalagens = [];
-  //String _pesquisa = '';
+  String _pesquisa = '';
+
+  void atualizarPesquisa(String novaPesquisa) {
+    setState(() {
+      _pesquisa = novaPesquisa;
+    });
+  }
 
   Future<List<Embalagem>> buscarEmbalagem(SupabaseClient client) async {
     final embalagensJson =
@@ -39,7 +46,10 @@ class _DashBoardEmbalagensState extends State<DashBoardEmbalagens> {
         padding: const EdgeInsets.all(defaultPadding),
         child: Column(
           children: [
-            const CabecalhoEmbalagem(),
+            CabecalhoEmbalagem(
+              keyEmbalagens: widget.keyEmbalagens,
+              onSearch: atualizarPesquisa,
+            ),
             const SizedBox(height: defaultPadding),
             Container(
               padding: const EdgeInsets.all(defaultPadding),
@@ -60,6 +70,14 @@ class _DashBoardEmbalagensState extends State<DashBoardEmbalagens> {
                         );
                       } else if (snapshot.hasData) {
                         embalagens = snapshot.data!;
+
+                        embalagens = embalagens
+                            .where(
+                              (ele) => ele.nome
+                                  .toLowerCase()
+                                  .contains(_pesquisa.toLowerCase()),
+                            )
+                            .toList();
 
                         return DataTable(
                           columnSpacing: 16.0,
@@ -104,19 +122,6 @@ class _DashBoardEmbalagensState extends State<DashBoardEmbalagens> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  DataCell columnData(String data) {
-    return DataCell(Text(data, style: const TextStyle(fontSize: 16)));
-  }
-
-  DataColumn columnTable(String title) {
-    return DataColumn(
-      label: Text(
-        title,
-        style: const TextStyle(color: textColor),
       ),
     );
   }

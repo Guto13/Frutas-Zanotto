@@ -6,9 +6,9 @@ import 'package:maca_ipe/screens/produtos/frutas/edit_frutas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashBoardFrutas extends StatefulWidget {
-  const DashBoardFrutas({
-    Key? key,
-  }) : super(key: key);
+  const DashBoardFrutas({Key? key, required this.keyFrutas}) : super(key: key);
+
+  final GlobalKey<ScaffoldState> keyFrutas;
 
   @override
   State<DashBoardFrutas> createState() => _DashBoardFrutasState();
@@ -17,7 +17,13 @@ class DashBoardFrutas extends StatefulWidget {
 class _DashBoardFrutasState extends State<DashBoardFrutas> {
   final client = Supabase.instance.client;
   List<Fruta> frutas = [];
-  //String _pesquisa = '';
+  String _pesquisa = '';
+
+  void atualizarPesquisa(String novaPesquisa) {
+    setState(() {
+      _pesquisa = novaPesquisa;
+    });
+  }
 
   Future<List<Fruta>> buscarFrutas(SupabaseClient client) async {
     final frutasJson = await client
@@ -41,7 +47,10 @@ class _DashBoardFrutasState extends State<DashBoardFrutas> {
         padding: const EdgeInsets.all(defaultPadding),
         child: Column(
           children: [
-            const CabecalhoFrutas(),
+            CabecalhoFrutas(
+              keyFrutas: widget.keyFrutas,
+              onSearch: atualizarPesquisa,
+            ),
             const SizedBox(height: defaultPadding),
             Container(
               padding: const EdgeInsets.all(defaultPadding),
@@ -62,6 +71,14 @@ class _DashBoardFrutasState extends State<DashBoardFrutas> {
                         );
                       } else if (snapshot.hasData) {
                         frutas = snapshot.data!;
+
+                        frutas = frutas
+                            .where(
+                              (ele) => ele.nomeVariedade
+                                  .toLowerCase()
+                                  .contains(_pesquisa.toLowerCase()),
+                            )
+                            .toList();
 
                         return DataTable(
                           columnSpacing: 16.0,
@@ -106,19 +123,6 @@ class _DashBoardFrutasState extends State<DashBoardFrutas> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  DataCell columnData(String data) {
-    return DataCell(Text(data, style: const TextStyle(fontSize: 16)));
-  }
-
-  DataColumn columnTable(String title) {
-    return DataColumn(
-      label: Text(
-        title,
-        style: const TextStyle(color: textColor),
       ),
     );
   }

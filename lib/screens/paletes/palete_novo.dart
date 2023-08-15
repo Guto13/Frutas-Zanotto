@@ -18,6 +18,9 @@ import 'package:maca_ipe/screens/paletes/palete_tabela.dart';
 import 'package:maca_ipe/screens/romaneio/card_romaneio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../componetes_gerais/future_drop_embalagem.dart';
+import '../../componetes_gerais/future_drop_fruta.dart';
+
 class PaleteNovo extends StatefulWidget {
   const PaleteNovo({Key? key}) : super(key: key);
 
@@ -35,6 +38,20 @@ class _PaleteNovoState extends State<PaleteNovo> {
   Fruta? _frutaSelecionadaM;
   Embalagem? _embalagemSelecionadaM;
 
+  void handleFrutaSelectedM(Fruta fruta) {
+    setState(() {
+      _frutaSelecionadaM = fruta;
+      _frutaM = _frutaSelecionadaM!.nomeVariedade;
+    });
+  }
+
+  void handleEmbalSelectedM(Embalagem embalagem) {
+    setState(() {
+      _embalagemSelecionadaM = embalagem;
+      _embalagemM = _embalagemSelecionadaM!.nome;
+    });
+  }
+
   //Ameixa e Pêssego
   List<TextEditingController> textControllersPA =
       List.generate(13, (_) => TextEditingController());
@@ -44,6 +61,20 @@ class _PaleteNovoState extends State<PaleteNovo> {
   Fruta? _frutaSelecionadaPA;
   Embalagem? _embalagemSelecionadaPA;
 
+  void handleFrutaSelectedPA(Fruta fruta) {
+    setState(() {
+      _frutaSelecionadaPA = fruta;
+      _frutaPA = _frutaSelecionadaPA!.nomeVariedade;
+    });
+  }
+
+  void handleEmbalSelectedPA(Embalagem embalagem) {
+    setState(() {
+      _embalagemSelecionadaPA = embalagem;
+      _embalagemPA = _embalagemSelecionadaPA!.nome;
+    });
+  }
+
   //Caqui e Pêra
   List<TextEditingController> textControllersCP =
       List.generate(6, (_) => TextEditingController());
@@ -52,6 +83,20 @@ class _PaleteNovoState extends State<PaleteNovo> {
   String _embalagemCP = '';
   Fruta? _frutaSelecionadaCP;
   Embalagem? _embalagemSelecionadaCP;
+
+  void handleFrutaSelectedCP(Fruta fruta) {
+    setState(() {
+      _frutaSelecionadaCP = fruta;
+      _frutaCP = _frutaSelecionadaCP!.nomeVariedade;
+    });
+  }
+
+  void handleEmbalSelectedCP(Embalagem embalagem) {
+    setState(() {
+      _embalagemSelecionadaCP = embalagem;
+      _embalagemCP = _embalagemSelecionadaCP!.nome;
+    });
+  }
 
   //Outro1
   final _nameController1 = TextEditingController();
@@ -268,72 +313,22 @@ class _PaleteNovoState extends State<PaleteNovo> {
           Row(mainAxisSize: MainAxisSize.min, children: [
             Expanded(
               flex: 1,
-              child: FutureBuilder<List<Fruta>>(
-                  future: fetchFrutas(client, 'Pêra', 'Caqui'),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    } else {
-                      List<Fruta> frutasCp = snapshot.data!;
-                      return DropdownButton<Fruta>(
-                        hint: const Text("Selecione uma Fruta"),
-                        items: frutasCp.map((Fruta fruta) {
-                          return DropdownMenuItem<Fruta>(
-                            value: fruta,
-                            child: Text(fruta.nomeVariedade),
-                          );
-                        }).toList(),
-                        onChanged: (Fruta? value) {
-                          setState(() {
-                            _frutaSelecionadaCP = value!;
-                            _frutaCP = _frutaSelecionadaCP!.nomeVariedade;
-                          });
-                        },
-                      );
-                    }
-                  }),
+              child: FutureDropFruta(
+                client: client,
+                onFrutaSelected: handleFrutaSelectedCP,
+                fruta1: 'Caqui',
+                fruta2: 'Pêra',
+              ),
             ),
             const SizedBox(
               width: defaultPadding * 2,
             ),
             Expanded(
               flex: 1,
-              child: FutureBuilder<List<Embalagem>>(
-                  future: fetchEmbalagens(client),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    } else {
-                      embalagens = snapshot.data!;
-                      return DropdownButton<Embalagem>(
-                        hint: const Text("Selecione uma Embalagem"),
-                        items: embalagens.map((Embalagem embalagem) {
-                          return DropdownMenuItem<Embalagem>(
-                            value: embalagem,
-                            child: Text(embalagem.nomePeso),
-                          );
-                        }).toList(),
-                        onChanged: (Embalagem? value) {
-                          setState(() {
-                            _embalagemSelecionadaCP = value;
-                            _embalagemCP = _embalagemSelecionadaCP!.nome;
-                          });
-                        },
-                      );
-                    }
-                  }),
+              child: FutureDropEmbalagem(
+                client: client,
+                onEmbalagemSelected: handleEmbalSelectedCP,
+              ),
             ),
           ]),
           const SizedBox(
@@ -380,72 +375,22 @@ class _PaleteNovoState extends State<PaleteNovo> {
           Row(mainAxisSize: MainAxisSize.min, children: [
             Expanded(
               flex: 1,
-              child: FutureBuilder<List<Fruta>>(
-                  future: fetchFrutas(client, 'Pêssego', 'Ameixa'),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    } else {
-                      List<Fruta> frutasPA = snapshot.data!;
-                      return DropdownButton<Fruta>(
-                        hint: const Text("Selecione uma Fruta"),
-                        items: frutasPA.map((Fruta fruta) {
-                          return DropdownMenuItem<Fruta>(
-                            value: fruta,
-                            child: Text(fruta.nomeVariedade),
-                          );
-                        }).toList(),
-                        onChanged: (Fruta? value) {
-                          setState(() {
-                            _frutaSelecionadaPA = value!;
-                            _frutaPA = _frutaSelecionadaPA!.nomeVariedade;
-                          });
-                        },
-                      );
-                    }
-                  }),
+              child: FutureDropFruta(
+                client: client,
+                onFrutaSelected: handleFrutaSelectedPA,
+                fruta1: 'Ameixa',
+                fruta2: 'Pêssego',
+              ),
             ),
             const SizedBox(
               width: defaultPadding * 2,
             ),
             Expanded(
               flex: 1,
-              child: FutureBuilder<List<Embalagem>>(
-                  future: fetchEmbalagens(client),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    } else {
-                      embalagens = snapshot.data!;
-                      return DropdownButton<Embalagem>(
-                        hint: const Text("Selecione uma Embalagem"),
-                        items: embalagens.map((Embalagem embalagem) {
-                          return DropdownMenuItem<Embalagem>(
-                            value: embalagem,
-                            child: Text(embalagem.nomePeso),
-                          );
-                        }).toList(),
-                        onChanged: (Embalagem? value) {
-                          setState(() {
-                            _embalagemSelecionadaPA = value;
-                            _embalagemPA = _embalagemSelecionadaPA!.nome;
-                          });
-                        },
-                      );
-                    }
-                  }),
+              child: FutureDropEmbalagem(
+                client: client,
+                onEmbalagemSelected: handleEmbalSelectedPA,
+              ),
             ),
           ]),
           const SizedBox(
@@ -499,72 +444,21 @@ class _PaleteNovoState extends State<PaleteNovo> {
       Row(mainAxisSize: MainAxisSize.min, children: [
         Expanded(
           flex: 1,
-          child: FutureBuilder<List<Fruta>>(
-              future: fetchFrutas(client, 'Maçã', ''),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else {
-                  List<Fruta> frutasM = snapshot.data!;
-                  return DropdownButton<Fruta>(
-                    hint: const Text("Selecione uma Fruta"),
-                    items: frutasM.map((Fruta fruta) {
-                      return DropdownMenuItem<Fruta>(
-                        value: fruta,
-                        child: Text(fruta.nomeVariedade),
-                      );
-                    }).toList(),
-                    onChanged: (Fruta? value) {
-                      setState(() {
-                        _frutaSelecionadaM = value!;
-                        _frutaM = _frutaSelecionadaM!.nomeVariedade;
-                      });
-                    },
-                  );
-                }
-              }),
+          child: FutureDropFruta(
+            client: client,
+            onFrutaSelected: handleFrutaSelectedM,
+            fruta1: 'Maçã',
+          ),
         ),
         const SizedBox(
           width: defaultPadding * 2,
         ),
         Expanded(
           flex: 1,
-          child: FutureBuilder<List<Embalagem>>(
-              future: fetchEmbalagens(client),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else {
-                  embalagens = snapshot.data!;
-                  return DropdownButton<Embalagem>(
-                    hint: const Text("Selecione uma Embalagem"),
-                    items: embalagens.map((Embalagem embalagem) {
-                      return DropdownMenuItem<Embalagem>(
-                        value: embalagem,
-                        child: Text(embalagem.nomePeso),
-                      );
-                    }).toList(),
-                    onChanged: (Embalagem? value) {
-                      setState(() {
-                        _embalagemSelecionadaM = value;
-                        _embalagemM = _embalagemSelecionadaM!.nome;
-                      });
-                    },
-                  );
-                }
-              }),
+          child: FutureDropEmbalagem(
+            client: client,
+            onEmbalagemSelected: handleEmbalSelectedM,
+          ),
         ),
       ]),
       const SizedBox(
@@ -717,7 +611,7 @@ class _PaleteNovoState extends State<PaleteNovo> {
         if (_outro2 == true) {
           _cadPaleteO2(paleteData[0]['id']);
         }
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(

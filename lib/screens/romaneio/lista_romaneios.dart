@@ -1,6 +1,5 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/romaneio_lista.dart';
@@ -150,15 +149,15 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
                               return DataRow(cells: [
                                 columnData(
                                     '${e.produtor.nome} ${e.produtor.sobrenome}',
-                                    e.id.toString()),
+                                   message: e.id.toString()),
                                 columnData(
                                     '${e.fruta.nome} ${e.fruta.variedade}',
-                                    e.id.toString()),
-                                columnData(e.embalagem.nome, e.id.toString()),
+                                   message: e.id.toString()),
+                                columnData(e.embalagem.nome,message: e.id.toString()),
                                 columnData(
                                     formatDate(
                                         e.data, [dd, '-', mm, '-', yyyy]),
-                                    e.id.toString()),
+                                   message: e.id.toString()),
                                 columnIconBtn(() {
                                   Navigator.push(
                                     context,
@@ -189,28 +188,4 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
         ));
   }
 
-  DataCell columnData(String data, String message) {
-    return DataCell(Tooltip(
-        message: message,
-        child: Text(data, style: const TextStyle(fontSize: 16))));
-  }
-
-  DataColumn columnTable(String title) {
-    return DataColumn(
-      label: Text(
-        title,
-        style: const TextStyle(color: textColor),
-      ),
-    );
-  }
-
-  DataCell columnIconBtn(VoidCallback press, String icon) {
-    return DataCell(
-      SvgPicture.asset(
-        icon,
-        height: 25,
-      ),
-      onTap: press,
-    );
-  }
 }

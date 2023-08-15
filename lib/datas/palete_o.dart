@@ -1,5 +1,6 @@
 class PaleteO {
   final int id;
+  final String table;
   final String embalagem;
   final int paleteId;
   final String nome;
@@ -8,6 +9,7 @@ class PaleteO {
 
   PaleteO({
     required this.id,
+    this.table = 'PaleteO',
     required this.embalagem,
     required this.paleteId,
     required this.nome,
@@ -17,6 +19,7 @@ class PaleteO {
   factory PaleteO.fromJson(Map<String, dynamic> json) {
     return PaleteO(
       id: json['id'],
+      table: json['Table'],
       embalagem: json['Embalagem'],
       paleteId: json['PaleteId'],
       nome: json['Nome'],

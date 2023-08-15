@@ -6,6 +6,7 @@ import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/produtor.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -64,41 +65,36 @@ class _AddProdutoresState extends State<AddProdutores> {
                               children: [
                                 SizedBox(
                                   width: const BoxConstraints().maxWidth / 3,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: TextFormField(
-                                          enabled: false,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'[0-9]')),
+                                  child: Responsive.isDesktop(context)
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: TextFormField(
+                                                enabled: false,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                inputFormatters: <
+                                                    TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .allow(RegExp(r'[0-9]')),
+                                                ],
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: 'Identificador',
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                                width: defaultPadding),
+                                            Expanded(
+                                              flex: 4,
+                                              child: fieldName(),
+                                            ),
                                           ],
-                                          decoration: const InputDecoration(
-                                            labelText: 'Identificador',
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: defaultPadding),
-                                      Expanded(
-                                        flex: 4,
-                                        child: TextFormField(
-                                          decoration: const InputDecoration(
-                                            labelText: 'Nome',
-                                          ),
-                                          validator: (value) {
-                                            if (value?.isEmpty ?? true) {
-                                              return 'Por favor, preencha este campo';
-                                            }
-                                            return null;
-                                          },
-                                          onSaved: (value) => _nome = value!,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                        )
+                                      : fieldName(),
                                 ),
                                 const SizedBox(height: 10.0),
                                 TextFormField(
@@ -166,6 +162,21 @@ class _AddProdutoresState extends State<AddProdutores> {
                     ),
                   ),
                 )),
+    );
+  }
+
+  TextFormField fieldName() {
+    return TextFormField(
+      decoration: const InputDecoration(
+        labelText: 'Nome',
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'Por favor, preencha este campo';
+        }
+        return null;
+      },
+      onSaved: (value) => _nome = value!,
     );
   }
 

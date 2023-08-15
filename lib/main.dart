@@ -1,7 +1,8 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, library_private_types_in_public_api, sort_child_properties_last, await_only_futures
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/screens/home_page.dart';
@@ -24,13 +25,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        scrollBehavior: MyCustomScrollBehavior(),
-        title: 'Minha Firma',
-        theme: ThemeData(
-          scaffoldBackgroundColor: bgColor.withOpacity(0.9),
-          primarySwatch: Colors.green,
-        ),
-        home: LoginScreen());
+      debugShowCheckedModeBanner: false,
+      scrollBehavior: MyCustomScrollBehavior(),
+      title: 'Minha Firma',
+      theme: ThemeData(
+        textTheme:
+            GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).apply(),
+        canvasColor: secondaryColor,
+        scaffoldBackgroundColor: bgColor.withOpacity(0.9),
+        primarySwatch: Colors.green,
+      ),
+      home: const LoginScreen(),
+    );
   }
 }
 
@@ -54,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void checkAuthentication() async {
-    final response = await client.auth.currentUser;
+    final response = client.auth.currentUser;
 
     if (response != null) {
       Navigator.pushReplacement(
@@ -69,18 +75,18 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Center(
         child: _isLoading
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : SingleChildScrollView(
                 child: Padding(
-                  padding: EdgeInsets.all(defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   child: Column(
                     children: <Widget>[
                       Image.asset('assets/images/Logo.png'),
                       const SizedBox(height: 30.0),
                       ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: 600),
+                        constraints: const BoxConstraints(maxWidth: 600),
                         child: Container(
-                          padding: EdgeInsets.all(defaultPadding),
+                          padding: const EdgeInsets.all(defaultPadding),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10.0),
@@ -111,9 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   },
                                   onSaved: (value) => _email = value!,
                                 ),
-                                SizedBox(height: 10.0),
+                                const SizedBox(height: 10.0),
                                 TextFormField(
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     labelText: 'Senha',
                                     prefixIcon: Icon(Icons.key),
                                   ),
@@ -127,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onSaved: (value) => _password = value!,
                                   onFieldSubmitted: (_) => _login(),
                                 ),
-                                SizedBox(height: 20.0),
+                                const SizedBox(height: 20.0),
                                 BotaoPadrao(
                                     context: context,
                                     title: "Entrar",

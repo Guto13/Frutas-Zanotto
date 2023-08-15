@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import '../../componetes_gerais/constants.dart';
+import '../../componetes_gerais/title_medium.dart';
+import '../../funcoes/responsive.dart';
 import 'entrada/estoque_entrada.dart';
 
 class CabecalhoEstoque extends StatelessWidget {
   final Function(String) onSearch;
+  final GlobalKey<ScaffoldState> keyEstoque;
 
-  const CabecalhoEstoque({Key? key, required this.onSearch}) : super(key: key);
+  const CabecalhoEstoque(
+      {Key? key, required this.onSearch, required this.keyEstoque})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        if (!Responsive.isDesktop(context))
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              keyEstoque.currentState!.openDrawer();
+            },
+          ),
+        TitleMedium(title: 'Estoque', context: context),
+        Spacer(
+          flex: Responsive.isDesktop(context) ? 2 : 1,
+        ),
         Expanded(
           child: TextField(
             onChanged: (value) {
@@ -43,7 +59,9 @@ class CabecalhoEstoque extends StatelessWidget {
             ),
           ),
         ),
-        const Spacer(),
+        const SizedBox(
+          width: defaultPadding,
+        ),
         BotaoPadrao(
           context: context,
           title: 'Entrada',
