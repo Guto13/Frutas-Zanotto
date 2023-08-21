@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/datas/embalagem.dart';
 import 'package:maca_ipe/funcoes/responsive.dart';
+import 'package:maca_ipe/screens/produtos/embalagens/edit_embalagens.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../componetes_gerais/botao_padrao.dart';
@@ -124,6 +125,12 @@ class _AddEmbalagensState extends State<AddEmbalagens> {
     );
   }
 
+  Embalagem parseEmbalagemJson(List<dynamic> responseBody) {
+    List<Embalagem> embalagens =
+        responseBody.map((e) => Embalagem.fromJson(e)).toList();
+    return embalagens[0];
+  }
+
   Future<void> _cadastro() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -131,12 +138,12 @@ class _AddEmbalagensState extends State<AddEmbalagens> {
         _isLoading = true;
       });
 
-      Embalagem fruta = Embalagem(id: 45, nome: _nome, pesoAprox: _pesoAprox);
+      Embalagem embalagem =
+          Embalagem(id: 45, nome: _nome, pesoAprox: _pesoAprox);
       try {
-        await client.from('Embalagem').insert(fruta.toMap());
-        setState(() {
-          _isLoading = false;
-        });
+        final embalagemCad =
+            await client.from('Embalagem').insert(embalagem.toMap()).select();
+        
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: const Text(
             "Embalagem cadastrada com sucesso",
@@ -144,6 +151,13 @@ class _AddEmbalagensState extends State<AddEmbalagens> {
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EditEmbalagens(
+                    embalagem: parseEmbalagemJson(embalagemCad),
+                  )),
+        );
       } on PostgrestException catch (error) {
         if (error.message ==
             'duplicate key value violates unique constraint "Embalagem_pkey"') {

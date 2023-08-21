@@ -494,7 +494,7 @@ class _PaleteNovoState extends State<PaleteNovo> {
       Row(
         children: [
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [

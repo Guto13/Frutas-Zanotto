@@ -5,114 +5,55 @@ import 'package:maca_ipe/screens/romaneio/romaneio_cp/romaneio_cp_screen.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_m/romaneio_m_screen.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_pa/romaneio_pa_screen.dart';
 
-class DashboardRomaneio extends StatelessWidget {
+class DashboardRomaneio extends StatefulWidget {
   const DashboardRomaneio({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<DashboardRomaneio> createState() => _DashboardRomaneioState();
+}
+
+class _DashboardRomaneioState extends State<DashboardRomaneio> {
+  List<Map<String, Widget>> buttons = [
+    {
+      'Maçã': const RomaneioMScreen(),
+    },
+    {
+      'Pêssego': const RomaneioPAScreen(frutaR: "Pêssego"),
+    },
+    {
+      'Ameixa': const RomaneioPAScreen(frutaR: "Ameixa"),
+    },
+    {
+      'Caqui': const RomaneioCPScreen(frutaR: "Caqui"),
+    },
+    {
+      'Pêra': const RomaneioCPScreen(frutaR: "Pêra"),
+    }
+  ];
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(defaultPadding),
-      child: Container(
-        padding: const EdgeInsets.all(defaultPadding),
-        decoration: const BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
-        ),
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: ButtonTextDefault(
-                      title: 'Maçã',
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RomaneioMScreen()),
-                      ),
+      child: GridView.count(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        crossAxisCount: 3,
+        crossAxisSpacing: defaultPadding,
+        mainAxisSpacing: defaultPadding,
+        children: [
+          ...buttons
+              .map((e) => ButtonTextDefault(
+                    title: e.keys.first,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => e.values.first),
                     ),
-                  ),
-                  const SizedBox(width: defaultPadding),
-                  Expanded(
-                    flex: 2,
-                    child: ButtonTextDefault(
-                      title: 'Pêssego',
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const RomaneioPAScreen(frutaR: "Pêssego")),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: defaultPadding * 2),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: ButtonTextDefault(
-                      title: 'Ameixa',
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const RomaneioPAScreen(frutaR: "Ameixa")),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: defaultPadding),
-                  Expanded(
-                    flex: 2,
-                    child: ButtonTextDefault(
-                      title: 'Caqui',
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const RomaneioCPScreen(frutaR: "Caqui")),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: defaultPadding * 2),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: ButtonTextDefault(
-                      title: 'Pêra',
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const RomaneioCPScreen(frutaR: "Pêra")),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: defaultPadding),
-                  Expanded(
-                    flex: 2,
-                    child: ButtonTextDefault(
-                      title: 'Caqui',
-                      onPressed: () {},
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+                  ))
+              .toList(),
+        ],
       ),
     );
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 
 class CardRomaneio extends StatelessWidget {
@@ -26,11 +28,11 @@ class CardRomaneio extends StatelessWidget {
             ),
           ],
         ),
-        width: 215,
+        width: 310,
         child: Row(
           children: [
             Expanded(
-                flex: 1,
+                flex: 2,
                 child: Text(
                   name,
                   style: const TextStyle(fontSize: fontSubTitle),
@@ -39,8 +41,18 @@ class CardRomaneio extends StatelessWidget {
               width: defaultPadding,
             ),
             Expanded(
+                child: BotaoPadrao(
+                    context: context,
+                    title: '',
+                    onPressed: () {
+                      int enteredValue = int.tryParse(controller.text) ?? 0;
+                      enteredValue -= 1;
+                      controller.text = enteredValue.toString();
+                    })),
+            Expanded(
               flex: 2,
               child: TextField(
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 controller: controller,
                 decoration: const InputDecoration(
                     label: Text(
@@ -49,6 +61,15 @@ class CardRomaneio extends StatelessWidget {
                 )),
               ),
             ),
+            Expanded(
+                child: BotaoPadrao(
+                    context: context,
+                    title: '',
+                    onPressed: () {
+                      int enteredValue = int.tryParse(controller.text) ?? 0;
+                      enteredValue += 1;
+                      controller.text = enteredValue.toString();
+                    })),
           ],
         ),
       ),

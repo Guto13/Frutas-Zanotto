@@ -7,6 +7,7 @@ import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/funcoes/responsive.dart';
+import 'package:maca_ipe/screens/produtores/edit_produtores.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -184,6 +185,12 @@ class _AddProdutoresState extends State<AddProdutores> {
     return text.replaceAll(RegExp(r'\D'), '');
   }
 
+  Produtor parseProdutorJson(List<dynamic> responseBody) {
+    List<Produtor> produtores =
+        responseBody.map((e) => Produtor.fromJson(e)).toList();
+    return produtores[0];
+  }
+
   Future<void> _cadastro() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -199,10 +206,9 @@ class _AddProdutoresState extends State<AddProdutores> {
           telefone: _telefone,
           contaB: _contaBancaria);
       try {
-        await client.from('Produtor').insert(produtor.toMap());
-        setState(() {
-          _isLoading = false;
-        });
+        final produtorCad =
+            await client.from('Produtor').insert(produtor.toMap()).select();
+        
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: const Text(
             "Produtor cadastrado com sucesso",
@@ -210,6 +216,13 @@ class _AddProdutoresState extends State<AddProdutores> {
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EditProdutores(
+                    produtor: parseProdutorJson(produtorCad),
+                  )),
+        );
       } on PostgrestException catch (error) {
         if (error.message ==
             'duplicate key value violates unique constraint "Produtor_pkey"') {

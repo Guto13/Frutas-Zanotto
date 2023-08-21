@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
-import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_m/romaneio_m_desktop.dart';
 
 class RomaneioMScreen extends StatefulWidget {
@@ -18,13 +17,7 @@ class _RomaneioMScreenState extends State<RomaneioMScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Romaneio - Maçã'),
-      body: LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth > maxWidthArea) {
-          return RomaneioMDesktop(textControllers: textControllers);
-        } else {
-          return const SingleChildScrollView();
-        }
-      }),
+      body: RomaneioMDesktop(textControllers: textControllers),
     );
   }
 }

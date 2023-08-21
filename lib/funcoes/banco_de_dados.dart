@@ -5,6 +5,7 @@ import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/carga.dart';
 import 'package:maca_ipe/datas/embalagem.dart';
 import 'package:maca_ipe/datas/estoque.dart';
+import 'package:maca_ipe/datas/estoque_lista.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/datas/palete.dart';
 import 'package:maca_ipe/datas/palete_cp.dart';
@@ -642,3 +643,21 @@ List<PaleteO> parsePaleteOJson(List<dynamic> responseBody) {
   List<PaleteO> paleteO = responseBody.map((e) => PaleteO.fromJson(e)).toList();
   return paleteO;
 }
+
+
+//Consulta de estoque
+Future<List<EstoqueLista>> buscarEstoqueSC(SupabaseClient client) async {
+    final estoqueJson = await client
+        .from("EstoqueSC")
+        .select(
+            'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)')
+        .order('Quantidade');
+
+    return parseEstoqueSC(estoqueJson);
+  }
+
+  List<EstoqueLista> parseEstoqueSC(List<dynamic> responseBody) {
+    List<EstoqueLista> estoque =
+        responseBody.map((e) => EstoqueLista.fromJson(e)).toList();
+    return estoque;
+  }

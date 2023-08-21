@@ -7,11 +7,13 @@ import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/campo_retorno.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/componetes_gerais/future_drop_produtor.dart';
 import 'package:maca_ipe/datas/embalagem.dart';
 import 'package:maca_ipe/datas/entradas.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/estoque/entrada/tabela_entradas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,7 +32,6 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
   bool _isLoading = false;
   DateTime _data = DateTime.now();
   final _quant = TextEditingController();
-  late List<Produtor> produtores;
 
   Fruta? _frutaSelecionada;
   Embalagem? _embalagemSelecionada;
@@ -50,38 +51,45 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
     });
   }
 
+  void handleProdutorSelected(Produtor produtor) {
+    setState(() {
+      _produtorSelecionado = produtor;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Entrada Produtos"),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: Container(),
-              ),
-              const Spacer(),
-              BotaoPadrao(context: context, title: 'Editar', onPressed: () {}),
-              BotaoPadrao(
-                context: context,
-                title: 'Entradas',
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const TabelaEntrada()),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Container(),
                 ),
-              ),
-            ],
-          ),
-          Container(
-            child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : SingleChildScrollView(
-                    child: Padding(
+                const Spacer(),
+                BotaoPadrao(
+                    context: context, title: 'Editar', onPressed: () {}),
+                BotaoPadrao(
+                  context: context,
+                  title: 'Entradas',
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const TabelaEntrada()),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Padding(
                       padding: const EdgeInsets.all(defaultPadding),
                       child: Form(
                         key: _formKey,
@@ -107,10 +115,93 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  SizedBox(
-                                    width: const BoxConstraints().maxWidth / 3,
-                                    child: Row(
+                                  if (Responsive.isDesktop(context))
+                                    SizedBox(
+                                      width:
+                                          const BoxConstraints().maxWidth / 3,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: FutureDropFruta(
+                                              client: client,
+                                              onFrutaSelected:
+                                                  handleFrutaSelected,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: defaultPadding * 2,
+                                          ),
+                                          Expanded(
+                                            flex: 1,
+                                            child: FutureDropEmbalagem(
+                                              client: client,
+                                              onEmbalagemSelected:
+                                                  handleEmbalSelected,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: defaultPadding * 2,
+                                          ),
+                                          Expanded(
+                                            flex: 1,
+                                            child: FutureDropProdutor(
+                                              client: client,
+                                              onProdutorSelect:
+                                                  handleProdutorSelected,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  const SizedBox(
+                                    height: defaultPadding,
+                                  ),
+                                  if (Responsive.isDesktop(context))
+                                    Row(
                                       mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: CampoRetorno(
+                                            controller: TextEditingController(
+                                                text: _frutaSelecionada
+                                                    ?.nomeVariedade),
+                                            label: 'Fruta',
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: defaultPadding * 2,
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: CampoRetorno(
+                                            controller: TextEditingController(
+                                                text: _embalagemSelecionada
+                                                    ?.nomePeso),
+                                            label: 'Embalagem',
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: defaultPadding * 2,
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: CampoRetorno(
+                                            controller: TextEditingController(
+                                                text: _produtorSelecionado
+                                                    ?.nomeCompleto),
+                                            label: 'Produtor',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  const SizedBox(
+                                    height: defaultPadding,
+                                  ),
+                                  if (!Responsive.isDesktop(context))
+                                    Row(
                                       children: [
                                         Expanded(
                                           flex: 1,
@@ -125,6 +216,24 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                                         ),
                                         Expanded(
                                           flex: 1,
+                                          child: CampoRetorno(
+                                            controller: TextEditingController(
+                                                text: _frutaSelecionada
+                                                    ?.nomeVariedade),
+                                            label: 'Fruta',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  if (!Responsive.isDesktop(context))
+                                    const SizedBox(
+                                      height: defaultPadding,
+                                    ),
+                                  if (!Responsive.isDesktop(context))
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
                                           child: FutureDropEmbalagem(
                                             client: client,
                                             onEmbalagemSelected:
@@ -136,93 +245,48 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: FutureBuilder<List<Produtor>>(
-                                              future: fetchProdutores(client),
-                                              builder: (context, snapshot) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                } else if (snapshot.hasError) {
-                                                  return Center(
-                                                    child: Text(
-                                                        'Error: ${snapshot.error}'),
-                                                  );
-                                                } else {
-                                                  produtores = snapshot.data!;
-                                                  return DropdownButton<
-                                                      Produtor>(
-                                                    hint: const Text(
-                                                        "Selecione um Produtor"),
-                                                    items: produtores.map(
-                                                        (Produtor produtor) {
-                                                      return DropdownMenuItem<
-                                                          Produtor>(
-                                                        value: produtor,
-                                                        child: Text(produtor
-                                                            .nomeCompleto),
-                                                      );
-                                                    }).toList(),
-                                                    onChanged:
-                                                        (Produtor? value) {
-                                                      setState(() {
-                                                        _produtorSelecionado =
-                                                            value;
-                                                      });
-                                                    },
-                                                  );
-                                                }
-                                              }),
+                                          child: CampoRetorno(
+                                            controller: TextEditingController(
+                                                text: _embalagemSelecionada
+                                                    ?.nomePeso),
+                                            label: 'Embalagem',
+                                          ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    height: defaultPadding,
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: CampoRetorno(
-                                          controller: TextEditingController(
-                                              text: _frutaSelecionada
-                                                  ?.nomeVariedade),
-                                          label: 'Fruta',
+                                  if (!Responsive.isDesktop(context))
+                                    const SizedBox(
+                                      height: defaultPadding,
+                                    ),
+                                  if (!Responsive.isDesktop(context))
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: FutureDropProdutor(
+                                            client: client,
+                                            onProdutorSelect:
+                                                handleProdutorSelected,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: defaultPadding * 2,
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: CampoRetorno(
-                                          controller: TextEditingController(
-                                              text: _embalagemSelecionada
-                                                  ?.nomePeso),
-                                          label: 'Embalagem',
+                                        const SizedBox(
+                                          width: defaultPadding * 2,
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: defaultPadding * 2,
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: CampoRetorno(
-                                          controller: TextEditingController(
-                                              text: _produtorSelecionado
-                                                  ?.nomeCompleto),
-                                          label: 'Produtor',
+                                        Expanded(
+                                          flex: 1,
+                                          child: CampoRetorno(
+                                            controller: TextEditingController(
+                                                text: _produtorSelecionado
+                                                    ?.nomeCompleto),
+                                            label: 'Produtor',
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: defaultPadding,
-                                  ),
+                                      ],
+                                    ),
+                                  if (!Responsive.isDesktop(context))
+                                    const SizedBox(
+                                      height: defaultPadding,
+                                    ),
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -278,9 +342,9 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                         ),
                       ),
                     ),
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -316,9 +380,10 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
-      setState(() {
-        _isLoading = false;
-      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TabelaEntrada()),
+      );
     } on PostgrestException catch (error) {
       if (error.message ==
           'duplicate key value violates unique constraint "Entradas_pkey"') {

@@ -28,19 +28,16 @@ class _RomaneioScreenState extends State<RomaneioScreen> {
               Expanded(child: LeftMenu(client: client)),
             Expanded(
               flex: 5,
-              child: Drawer(
-                backgroundColor: bgColor.withOpacity(0.9),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children:  [
-                      CabecalhoRomaneio(keyRomaneio: key,),
-                      const SizedBox(
-                        width: defaultPadding,
-                      ),
-                      const DashboardRomaneio(),
-                    ],
-                  ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:  [
+                    CabecalhoRomaneio(keyRomaneio: key,),
+                    const SizedBox(
+                      width: defaultPadding,
+                    ),
+                    const DashboardRomaneio(),
+                  ],
                 ),
               ),
             ),

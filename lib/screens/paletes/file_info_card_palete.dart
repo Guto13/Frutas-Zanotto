@@ -15,7 +15,7 @@ class FileInfoCardGridView extends StatelessWidget {
     this.crossAxisCount = 4,
     this.childAspectRatio = 1,
     required this.paletes,
-    required this.client,
+    required this.client, 
   }) : super(key: key);
 
   final int crossAxisCount;

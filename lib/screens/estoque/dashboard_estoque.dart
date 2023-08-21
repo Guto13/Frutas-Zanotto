@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/componetes_gerais/title_medium.dart';
 import 'package:maca_ipe/datas/estoque_lista.dart';
+import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/screens/estoque/cabecalho_estoque.dart';
 import 'package:maca_ipe/screens/estoque/estoque_statics.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -28,22 +29,6 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
     setState(() {
       _pesquisa = novaPesquisa;
     });
-  }
-
-  Future<List<EstoqueLista>> buscarEstoqueSC(SupabaseClient client) async {
-    final estoqueJson = await client
-        .from("EstoqueSC")
-        .select(
-            'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)')
-        .order('Quantidade');
-
-    return parseEstoqueSC(estoqueJson);
-  }
-
-  List<EstoqueLista> parseEstoqueSC(List<dynamic> responseBody) {
-    List<EstoqueLista> estoque =
-        responseBody.map((e) => EstoqueLista.fromJson(e)).toList();
-    return estoque;
   }
 
   @override

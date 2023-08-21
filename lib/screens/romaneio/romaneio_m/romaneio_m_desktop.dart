@@ -4,14 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/campo_retorno.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/componetes_gerais/future_drop_fruta.dart';
+import 'package:maca_ipe/componetes_gerais/future_drop_produtor.dart';
 import 'package:maca_ipe/datas/embalagem.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/datas/romaneio.dart';
 import 'package:maca_ipe/datas/romaneio_m.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/romaneio/card_romaneio.dart';
+import 'package:maca_ipe/screens/romaneio/lista_romaneios.dart';
+import 'package:maca_ipe/screens/romaneio/romaneio_completo.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../componetes_gerais/future_drop_embalagem.dart';
 
 class RomaneioMDesktop extends StatefulWidget {
   const RomaneioMDesktop({
@@ -28,15 +35,30 @@ class RomaneioMDesktop extends StatefulWidget {
 class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  late List<Fruta> frutas;
-  late List<Embalagem> embalagens;
-  late List<Produtor> produtores;
 
   Fruta? _frutaSelecionada;
   Embalagem? _embalagemSelecionada;
   Produtor? _produtorSelecionado;
 
   final client = Supabase.instance.client;
+
+  void handleFrutaSelected(Fruta fruta) {
+    setState(() {
+      _frutaSelecionada = fruta;
+    });
+  }
+
+  void handleEmbalSelected(Embalagem embalagem) {
+    setState(() {
+      _embalagemSelecionada = embalagem;
+    });
+  }
+
+  void handleProdutorSelected(Produtor produtor) {
+    setState(() {
+      _produtorSelecionado = produtor;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,170 +84,170 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: const BoxConstraints().maxWidth / 3,
-                          child: Row(
+                        if (Responsive.isDesktop(context))
+                          SizedBox(
+                            width: const BoxConstraints().maxWidth / 3,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: FutureDropFruta(
+                                    client: client,
+                                    onFrutaSelected: handleFrutaSelected,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: defaultPadding * 2,
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: FutureDropEmbalagem(
+                                    client: client,
+                                    onEmbalagemSelected: handleEmbalSelected,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: defaultPadding * 2,
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: FutureDropProdutor(
+                                    client: client,
+                                    onProdutorSelect: handleProdutorSelected,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        if (Responsive.isDesktop(context))
+                          Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Expanded(
                                 flex: 1,
-                                child: FutureBuilder<List<Fruta>>(
-                                    future: fetchFrutas(client, 'Maçã', ''),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return Center(
-                                          child:
-                                              Text('Error: ${snapshot.error}'),
-                                        );
-                                      } else {
-                                        frutas = snapshot.data!;
-                                        return DropdownButton<Fruta>(
-                                          hint:
-                                              const Text("Selecione uma Fruta"),
-                                          items: frutas.map((Fruta fruta) {
-                                            return DropdownMenuItem<Fruta>(
-                                              value: fruta,
-                                              child: Text(fruta.nomeVariedade),
-                                            );
-                                          }).toList(),
-                                          onChanged: (Fruta? value) {
-                                            setState(() {
-                                              _frutaSelecionada = value!;
-                                            });
-                                          },
-                                        );
-                                      }
-                                    }),
+                                child: CampoRetorno(
+                                  controller: TextEditingController(
+                                      text: _frutaSelecionada?.nomeVariedade),
+                                  label: 'Fruta',
+                                ),
                               ),
                               const SizedBox(
                                 width: defaultPadding * 2,
                               ),
                               Expanded(
                                 flex: 1,
-                                child: FutureBuilder<List<Embalagem>>(
-                                    future: fetchEmbalagens(client),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return Center(
-                                          child:
-                                              Text('Error: ${snapshot.error}'),
-                                        );
-                                      } else {
-                                        embalagens = snapshot.data!;
-                                        return DropdownButton<Embalagem>(
-                                          hint: const Text(
-                                              "Selecione uma Embalagem"),
-                                          items: embalagens
-                                              .map((Embalagem embalagem) {
-                                            return DropdownMenuItem<Embalagem>(
-                                              value: embalagem,
-                                              child: Text(embalagem.nomePeso),
-                                            );
-                                          }).toList(),
-                                          onChanged: (Embalagem? value) {
-                                            setState(() {
-                                              _embalagemSelecionada = value;
-                                            });
-                                          },
-                                        );
-                                      }
-                                    }),
+                                child: CampoRetorno(
+                                  controller: TextEditingController(
+                                      text: _embalagemSelecionada?.nomePeso),
+                                  label: 'Embalagem',
+                                ),
+                              ),
+                              const SizedBox(
+                                width: defaultPadding * 2,
                               ),
                               Expanded(
                                 flex: 1,
-                                child: FutureBuilder<List<Produtor>>(
-                                    future: fetchProdutores(client),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return Center(
-                                          child:
-                                              Text('Error: ${snapshot.error}'),
-                                        );
-                                      } else {
-                                        produtores = snapshot.data!;
-                                        return DropdownButton<Produtor>(
-                                          hint: const Text(
-                                              "Selecione um Produtor"),
-                                          items: produtores
-                                              .map((Produtor produtor) {
-                                            return DropdownMenuItem<Produtor>(
-                                              value: produtor,
-                                              child:
-                                                  Text(produtor.nomeCompleto),
-                                            );
-                                          }).toList(),
-                                          onChanged: (Produtor? value) {
-                                            setState(() {
-                                              _produtorSelecionado = value;
-                                            });
-                                          },
-                                        );
-                                      }
-                                    }),
+                                child: CampoRetorno(
+                                  controller: TextEditingController(
+                                      text: _produtorSelecionado?.nomeCompleto),
+                                  label: 'Produtor',
+                                ),
                               ),
                             ],
                           ),
-                        ),
                         const SizedBox(
                           height: defaultPadding,
                         ),
+                        if (!Responsive.isDesktop(context))
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: FutureDropFruta(
+                                  client: client,
+                                  onFrutaSelected: handleFrutaSelected,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: defaultPadding * 2,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: CampoRetorno(
+                                  controller: TextEditingController(
+                                      text: _frutaSelecionada?.nomeVariedade),
+                                  label: 'Fruta',
+                                ),
+                              ),
+                            ],
+                          ),
+                        if (!Responsive.isDesktop(context))
+                          const SizedBox(
+                            height: defaultPadding,
+                          ),
+                        if (!Responsive.isDesktop(context))
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: FutureDropEmbalagem(
+                                  client: client,
+                                  onEmbalagemSelected: handleEmbalSelected,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: defaultPadding * 2,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: CampoRetorno(
+                                  controller: TextEditingController(
+                                      text: _embalagemSelecionada?.nomePeso),
+                                  label: 'Embalagem',
+                                ),
+                              ),
+                            ],
+                          ),
+                        if (!Responsive.isDesktop(context))
+                          const SizedBox(
+                            height: defaultPadding,
+                          ),
+                        if (!Responsive.isDesktop(context))
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: FutureDropProdutor(
+                                  client: client,
+                                  onProdutorSelect: handleProdutorSelected,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: defaultPadding * 2,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: CampoRetorno(
+                                  controller: TextEditingController(
+                                      text: _produtorSelecionado?.nomeCompleto),
+                                  label: 'Produtor',
+                                ),
+                              ),
+                            ],
+                          ),
+                        if (!Responsive.isDesktop(context))
+                          const SizedBox(
+                            height: defaultPadding,
+                          ),
                         Row(
-                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              flex: 1,
-                              child: CampoRetorno(
-                                controller: TextEditingController(
-                                    text: _frutaSelecionada?.nomeVariedade),
-                                label: 'Fruta',
-                              ),
-                            ),
-                            const SizedBox(
-                              width: defaultPadding * 2,
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: CampoRetorno(
-                                controller: TextEditingController(
-                                    text: _embalagemSelecionada?.nomePeso),
-                                label: 'Embalagem',
-                              ),
-                            ),
-                            const SizedBox(
-                              width: defaultPadding * 2,
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: CampoRetorno(
-                                controller: TextEditingController(
-                                    text: _produtorSelecionado?.nomeCompleto),
-                                label: 'Produtor',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: defaultPadding,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
+                              flex: 2,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -399,6 +421,11 @@ class _RomaneioMDesktopState extends State<RomaneioMDesktop> {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ListaRomaneios()),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
+import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/romaneio_lista.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_completo.dart';
@@ -83,9 +84,8 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
                     ),
                   ),
                   const Spacer(),
-                  const SizedBox(
-                    width: defaultPadding,
-                  ),
+                  BotaoPadrao(
+                      context: context, title: 'P/ Produtor', onPressed: () {}),
                 ],
               ),
               const SizedBox(height: defaultPadding),
@@ -149,15 +149,16 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
                               return DataRow(cells: [
                                 columnData(
                                     '${e.produtor.nome} ${e.produtor.sobrenome}',
-                                   message: e.id.toString()),
+                                    message: e.id.toString()),
                                 columnData(
                                     '${e.fruta.nome} ${e.fruta.variedade}',
-                                   message: e.id.toString()),
-                                columnData(e.embalagem.nome,message: e.id.toString()),
+                                    message: e.id.toString()),
+                                columnData(e.embalagem.nome,
+                                    message: e.id.toString()),
                                 columnData(
                                     formatDate(
                                         e.data, [dd, '-', mm, '-', yyyy]),
-                                   message: e.id.toString()),
+                                    message: e.id.toString()),
                                 columnIconBtn(() {
                                   Navigator.push(
                                     context,
@@ -187,5 +188,4 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
           ),
         ));
   }
-
 }

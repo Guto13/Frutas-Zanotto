@@ -8,6 +8,7 @@ import 'package:maca_ipe/componetes_gerais/title_medium.dart';
 import 'package:maca_ipe/datas/classificacao.dart';
 import 'package:maca_ipe/datas/estoque_lista.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/screens/classificacao/classificacao_screen.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../componetes_gerais/botao_padrao.dart';
@@ -376,6 +377,7 @@ class _CadastroClassifiState extends State<CadastroClassifi> {
   String removeNonDigits(String text) {
     return text.replaceAll(RegExp(r'\D'), '');
   }
+
   Future<void> _salvar() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -409,9 +411,10 @@ class _CadastroClassifiState extends State<CadastroClassifi> {
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
-      setState(() {
-        _isLoading = false;
-      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ClassificacaoScreen()),
+      );
     } on PostgrestException catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(error.message),

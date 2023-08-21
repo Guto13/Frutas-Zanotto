@@ -7,6 +7,7 @@ import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/funcoes/responsive.dart';
+import 'package:maca_ipe/screens/produtos/frutas/edit_frutas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddFrutas extends StatefulWidget {
@@ -148,6 +149,11 @@ class _AddFrutasState extends State<AddFrutas> {
     );
   }
 
+  Fruta parseFrutaJson(List<dynamic> responseBody) {
+    List<Fruta> frutas = responseBody.map((e) => Fruta.fromJson(e)).toList();
+    return frutas[0];
+  }
+
   Future<void> _cadastro() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -158,10 +164,9 @@ class _AddFrutasState extends State<AddFrutas> {
       Fruta fruta =
           Fruta(id: int.parse(_id), nome: _nome, variedade: _variedade);
       try {
-        await client.from('Fruta').insert(fruta.toMap());
-        setState(() {
-          _isLoading = false;
-        });
+        final frutaCad =
+            await client.from('Fruta').insert(fruta.toMap()).select();
+        
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: const Text(
             "Fruta cadastrada com sucesso",
@@ -169,6 +174,13 @@ class _AddFrutasState extends State<AddFrutas> {
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EditFrutas(
+                    fruta: parseFrutaJson(frutaCad),
+                  )),
+        );
       } on PostgrestException catch (error) {
         if (error.message ==
             'duplicate key value violates unique constraint "Fruta_pkey"') {
