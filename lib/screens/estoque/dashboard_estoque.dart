@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/componetes_gerais/title_medium.dart';
 import 'package:maca_ipe/datas/estoque_lista.dart';
@@ -9,7 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashboardEstoque extends StatefulWidget {
   const DashboardEstoque({
-    Key? key, required this.keyEstoque,
+    Key? key,
+    required this.keyEstoque,
   }) : super(key: key);
 
   final GlobalKey<ScaffoldState> keyEstoque;
@@ -20,7 +22,7 @@ class DashboardEstoque extends StatefulWidget {
 
 class _DashboardEstoqueState extends State<DashboardEstoque> {
   final client = Supabase.instance.client;
-  List<EstoqueLista> estoqueSC = [];
+  List<EstoqueLista> estoque = [];
   String tabela = 'EstoqueSC';
   String _pesquisa = '';
   bool _isChecked = false;
@@ -42,6 +44,9 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
             CabecalhoEstoque(
               onSearch: atualizarPesquisa,
               keyEstoque: widget.keyEstoque,
+              title: tabela == 'EstoqueSC'
+                  ? 'Estoque a Classificar'
+                  : 'Estoque Classificado',
             ),
             const SizedBox(height: defaultPadding),
             Container(
@@ -73,8 +78,20 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                         ),
                       ),
                       const Spacer(
-                        flex: 2,
+                        flex: 1,
                       ),
+                      BotaoPadrao(
+                          context: context,
+                          title: "Mudar Estoque",
+                          onPressed: () {
+                            setState(() {
+                              if (tabela == 'EstoqueSC') {
+                                tabela = 'EstoqueC';
+                              } else {
+                                tabela = 'EstoqueSC';
+                              }
+                            });
+                          })
                     ],
                   ),
                 ],
@@ -86,16 +103,16 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
             SizedBox(
               width: double.infinity,
               child: FutureBuilder<List<EstoqueLista>>(
-                  future: buscarEstoqueSC(client),
+                  future: buscarEstoque(client, tabela),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
                     } else if (snapshot.hasData) {
-                      estoqueSC = snapshot.data!;
+                      estoque = snapshot.data!;
                       //Organiza os dados baseado na pesquisa
-                      estoqueSC = estoqueSC
+                      estoque = estoque
                           .where(
                             (est) =>
                                 est.fruta.nome
@@ -116,7 +133,7 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                           )
                           .toList();
                       if (_isChecked == false) {
-                        estoqueSC = estoqueSC
+                        estoque = estoque
                             .where((element) => element.quantidade > 0)
                             .toList();
                       }
@@ -147,7 +164,7 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                                   columnTable('Embalagem'),
                                   columnTable('Quantidade'),
                                 ],
-                                rows: estoqueSC.map((e) {
+                                rows: estoque.map((e) {
                                   return DataRow(cells: [
                                     columnData(
                                         '${e.fruta.nome} ${e.fruta.variedade}'),
@@ -172,7 +189,7 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                                   Radius.circular(10),
                                 ),
                               ),
-                              child: EstoqueStatics(estoque: estoqueSC),
+                              child: EstoqueStatics(estoque: estoque),
                             ),
                           ),
                         ],

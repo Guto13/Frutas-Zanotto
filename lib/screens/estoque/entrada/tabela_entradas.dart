@@ -25,7 +25,7 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
     final entradasJson = await client
         .from('Entradas')
         .select(
-            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome), Data')
+            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome), Data, IsClassifi')
         .order('Data');
 
     return parseEntrada(entradasJson);
@@ -107,7 +107,8 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
                                                     e.fruta.id,
                                                     e.produtor.id,
                                                     e.embalagem.id,
-                                                    e.quantidade);
+                                                    e.quantidade,
+                                                    e.isClassifi);
                                                 setState(() {
                                                   _isloading = false;
                                                 });
@@ -143,33 +144,38 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
         ));
   }
 
-  DataCell columnData(String data) {
-    return DataCell(Text(data, style: const TextStyle(fontSize: 16)));
-  }
-
-  DataColumn columnTable(String title) {
-    return DataColumn(
-      label: Text(title,
-          style: const TextStyle(
-              color: textColor, fontWeight: FontWeight.bold, fontSize: 18)),
-    );
-  }
-
   Future<void> _onConfirm(int id, int frutaId, int produtorId, int embalagemId,
-      double quantidade) async {
-    try {
-      await excluirEntradaSC(
-          client, frutaId, produtorId, embalagemId, quantidade, id, context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            "Erro ao excluir tente novamente",
-            style: TextStyle(color: textColor),
+      double quantidade, bool isClassifi) async {
+    if (isClassifi) {
+      try {
+        await excluirEntradaC(
+            client, frutaId, produtorId, embalagemId, quantidade, id, context);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              "Erro ao excluir tente novamente",
+              style: TextStyle(color: textColor),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+        );
+      }
+    } else {
+      try {
+        await excluirEntradaSC(
+            client, frutaId, produtorId, embalagemId, quantidade, id, context);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              "Erro ao excluir tente novamente",
+              style: TextStyle(color: textColor),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     }
   }
 }

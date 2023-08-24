@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/componetes_gerais/left_menu.dart';
 import 'package:maca_ipe/screens/classificacao/cabecalho_classifi.dart';
 import 'package:maca_ipe/screens/classificacao/cadastro_classifi.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ClassificacaoScreen extends StatefulWidget {
   const ClassificacaoScreen({Key? key}) : super(key: key);
@@ -19,25 +21,24 @@ class _ClassificacaoScreenState extends State<ClassificacaoScreen> {
     });
   }
 
+  final client = Supabase.instance.client;
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth > maxWidthArea) {
-        return Scaffold(
-            appBar: CustomAppBar(title: 'Classificação'),
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  CabecalhoClassifi(
-                    onSearch: atualizarPesquisa,
-                  ),
-                  CadastroClassifi(pesquisa: _pesquisa),
-                ],
+    final GlobalKey<ScaffoldState> key = GlobalKey();
+    return Scaffold(
+        key: key,
+        drawer: LeftMenu(client: client),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              CabecalhoClassifi(
+                onSearch: atualizarPesquisa,
+                keyClassifi: key,
               ),
-            ));
-      } else {
-        return const Center();
-      }
-    });
+              CadastroClassifi(pesquisa: _pesquisa),
+            ],
+          ),
+        ));
   }
 }

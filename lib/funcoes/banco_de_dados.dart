@@ -36,10 +36,28 @@ Future<Map<String, dynamic>?> consultaEstoqueSC(SupabaseClient supabase,
   return response.length > 0 ? response[0] : null;
 }
 
+Future<Map<String, dynamic>?> consultaEstoqueC(SupabaseClient supabase,
+    int frutaId, int produtorId, int embalagemId) async {
+  final response = await supabase
+      .from('EstoqueC')
+      .select('*')
+      .eq('FrutaId', frutaId)
+      .eq('ProdutorId', produtorId)
+      .eq('EmbalagemId', embalagemId);
+
+  return response.length > 0 ? response[0] : null;
+}
+
 // Função para inserir um novo item no estoque
 Future<void> insereEstoqueSC(SupabaseClient supabase, Estoque estoque) async {
   try {
     await supabase.from('EstoqueSC').insert(estoque.toMap());
+  } catch (e) {}
+}
+
+Future<void> insereEstoqueC(SupabaseClient supabase, Estoque estoque) async {
+  try {
+    await supabase.from('EstoqueC').insert(estoque.toMap());
   } catch (e) {}
 }
 
@@ -58,6 +76,17 @@ Future<void> atualizaEstoqueSC(SupabaseClient supabase, int frutaId,
     int produtorId, int embalagemId, double quantidade) async {
   try {
     await supabase.from('EstoqueSC').update({'Quantidade': quantidade}).match({
+      'FrutaId': frutaId,
+      'ProdutorId': produtorId,
+      'EmbalagemId': embalagemId
+    });
+  } catch (e) {}
+}
+
+Future<void> atualizaEstoqueC(SupabaseClient supabase, int frutaId,
+    int produtorId, int embalagemId, double quantidade) async {
+  try {
+    await supabase.from('EstoqueC').update({'Quantidade': quantidade}).match({
       'FrutaId': frutaId,
       'ProdutorId': produtorId,
       'EmbalagemId': embalagemId
@@ -91,6 +120,31 @@ Future<void> processaEntradaSC(SupabaseClient supabase, int frutaId,
   }
 }
 
+Future<void> processaEntradaC(SupabaseClient supabase, int frutaId,
+    int produtorId, int embalagemId, double quantidade) async {
+  Map<String, dynamic>? itemEstoque =
+      await consultaEstoqueC(supabase, frutaId, produtorId, embalagemId);
+
+  if (itemEstoque != null) {
+    // Se o item existir no estoque, atualiza a quantidade
+    int quantidadeAntiga = itemEstoque['Quantidade'];
+    double novaQuantidade = quantidadeAntiga + quantidade;
+    await atualizaEstoqueC(
+        supabase, frutaId, produtorId, embalagemId, novaQuantidade);
+  } else {
+    // Se o item não existir no estoque, cria um novo registro
+
+    await insereEstoqueC(
+        supabase,
+        Estoque(
+            id: 1,
+            frutaId: frutaId,
+            embalagemId: embalagemId,
+            quantidade: quantidade,
+            produtorId: produtorId));
+  }
+}
+
 // Função para lidar com a exclusão de uma entrada
 Future<void> excluirEntradaSC(
     SupabaseClient supabase,
@@ -107,6 +161,47 @@ Future<void> excluirEntradaSC(
   double novaQuantidade = quantidadeAntiga - quantidade;
   if (novaQuantidade >= 0) {
     await atualizaEstoqueSC(
+        supabase, frutaId, produtorId, embalagemId, novaQuantidade);
+
+    await supabase.from('Entradas').delete().eq('id', id);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          "Entrada excluida com sucesso",
+          style: TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          "Estoque negativo, impossível excluir a entrada",
+          style: TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+Future<void> excluirEntradaC(
+    SupabaseClient supabase,
+    int frutaId,
+    int produtorId,
+    int embalagemId,
+    double quantidade,
+    int id,
+    BuildContext context) async {
+  Map<String, dynamic>? itemEstoque =
+      await consultaEstoqueC(supabase, frutaId, produtorId, embalagemId);
+
+  int quantidadeAntiga = itemEstoque!['Quantidade'];
+  double novaQuantidade = quantidadeAntiga - quantidade;
+  if (novaQuantidade >= 0) {
+    await atualizaEstoqueC(
         supabase, frutaId, produtorId, embalagemId, novaQuantidade);
 
     await supabase.from('Entradas').delete().eq('id', id);
@@ -646,17 +741,17 @@ List<PaleteO> parsePaleteOJson(List<dynamic> responseBody) {
 }
 
 //Consulta de estoque
-Future<List<EstoqueLista>> buscarEstoqueSC(SupabaseClient client) async {
+Future<List<EstoqueLista>> buscarEstoque(SupabaseClient client, String tabela) async {
   final estoqueJson = await client
-      .from("EstoqueSC")
+      .from(tabela)
       .select(
           'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)')
       .order('Quantidade');
 
-  return parseEstoqueSC(estoqueJson);
+  return parseEstoque(estoqueJson);
 }
 
-List<EstoqueLista> parseEstoqueSC(List<dynamic> responseBody) {
+List<EstoqueLista> parseEstoque(List<dynamic> responseBody) {
   List<EstoqueLista> estoque =
       responseBody.map((e) => EstoqueLista.fromJson(e)).toList();
   return estoque;

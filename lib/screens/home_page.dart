@@ -140,7 +140,8 @@ class HomePage extends StatelessWidget {
                                       ),
                                     ),
                                     child: FutureBuilder<List<EstoqueLista>>(
-                                        future: buscarEstoqueSC(client),
+                                        future:
+                                            buscarEstoque(client, 'EstoqueC'),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
@@ -149,13 +150,20 @@ class HomePage extends StatelessWidget {
                                                   CircularProgressIndicator(),
                                             );
                                           } else if (snapshot.hasData) {
-                                            List<EstoqueLista> estoqueSC =
+                                            List<EstoqueLista> estoque =
                                                 snapshot.data!;
 
-                                            return EstoqueStatics(
-                                              estoque: estoqueSC,
-                                              fruta: true,
-                                              produtor: false,
+                                            return Column(
+                                              children: [
+                                                const Text(
+                                                    'Estoque Classificado'),
+                                                const SizedBox(
+                                                  height: defaultPadding,
+                                                ),
+                                                EstoqueStatics(
+                                                  estoque: estoque,
+                                                ),
+                                              ],
                                             );
                                           } else {
                                             return const Center(
@@ -185,7 +193,8 @@ class HomePage extends StatelessWidget {
                                       ),
                                     ),
                                     child: FutureBuilder<List<EstoqueLista>>(
-                                        future: buscarEstoqueSC(client),
+                                        future:
+                                            buscarEstoque(client, "EstoqueSC"),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
@@ -194,12 +203,20 @@ class HomePage extends StatelessWidget {
                                                   CircularProgressIndicator(),
                                             );
                                           } else if (snapshot.hasData) {
-                                            List<EstoqueLista> estoqueSC =
+                                            List<EstoqueLista> estoque =
                                                 snapshot.data!;
 
-                                            return EstoqueStatics(
-                                              estoque: estoqueSC,
-                                              fruta: false,
+                                            return Column(
+                                              children: [
+                                                const Text(
+                                                    'Estoque a Classificar'),
+                                                const SizedBox(
+                                                  height: defaultPadding,
+                                                ),
+                                                EstoqueStatics(
+                                                  estoque: estoque,
+                                                ),
+                                              ],
                                             );
                                           } else {
                                             return const Center(

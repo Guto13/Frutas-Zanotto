@@ -79,7 +79,7 @@ class _CadastroClassifiState extends State<CadastroClassifi> {
                 ),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 200,
+                  height: 300,
                   child: FutureBuilder<List<EstoqueLista>>(
                     future: buscarEstoqueSC(client),
                     builder: ((context, snapshot) {
@@ -221,17 +221,6 @@ class _CadastroClassifiState extends State<CadastroClassifi> {
                                   controller:
                                       TextEditingController(text: _fruta),
                                   label: 'Fruta',
-                                ),
-                              ),
-                              const SizedBox(
-                                width: defaultPadding * 1.5,
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: CampoRetorno(
-                                  controller:
-                                      TextEditingController(text: _embalagem),
-                                  label: 'Embalagem',
                                 ),
                               ),
                               const SizedBox(

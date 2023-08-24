@@ -76,7 +76,7 @@ class _EstoqueStaticsState extends State<EstoqueStatics> {
                               }),
                               child: Container(
                                 decoration: frutaSN
-                                    ? const BoxDecoration(color: Colors.blue)
+                                    ? const BoxDecoration(color: Colors.green)
                                     : const BoxDecoration(),
                                 child: const Text('Fruta'),
                               ),
@@ -91,7 +91,7 @@ class _EstoqueStaticsState extends State<EstoqueStatics> {
                               child: Container(
                                 decoration: frutaSN
                                     ? const BoxDecoration()
-                                    : const BoxDecoration(color: Colors.blue),
+                                    : const BoxDecoration(color: Colors.green),
                                 child: const Text('Produtor'),
                               ),
                             ),
@@ -258,7 +258,7 @@ class ChartEstoque extends StatelessWidget {
       chartType: ChartType.disc,
       chartValuesOptions:
           const ChartValuesOptions(showChartValuesOutside: true),
-      baseChartColor: Colors.green,
+      baseChartColor: Color.fromARGB(255, 240, 7, 209),
       legendOptions: LegendOptions(legendPosition: legendPosition),
     );
   }

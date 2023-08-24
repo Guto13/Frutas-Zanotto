@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:maca_ipe/componetes_gerais/alert.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
+import 'package:maca_ipe/screens/estoque/entrada/estoque_c_entrada.dart';
 import '../../componetes_gerais/constants.dart';
 import '../../componetes_gerais/title_medium.dart';
 import '../../funcoes/responsive.dart';
-import 'entrada/estoque_entrada.dart';
+import 'entrada/estoque_sc_entrada.dart';
 
 class CabecalhoEstoque extends StatelessWidget {
   final Function(String) onSearch;
   final GlobalKey<ScaffoldState> keyEstoque;
+  final String title;
 
   const CabecalhoEstoque(
-      {Key? key, required this.onSearch, required this.keyEstoque})
+      {Key? key,
+      required this.onSearch,
+      required this.keyEstoque,
+      required this.title})
       : super(key: key);
 
   @override
@@ -24,7 +30,7 @@ class CabecalhoEstoque extends StatelessWidget {
               keyEstoque.currentState!.openDrawer();
             },
           ),
-        TitleMedium(title: 'Estoque', context: context),
+        TitleMedium(title: title, context: context),
         Spacer(
           flex: Responsive.isDesktop(context) ? 2 : 1,
         ),
@@ -65,10 +71,26 @@ class CabecalhoEstoque extends StatelessWidget {
         BotaoPadrao(
           context: context,
           title: 'Entrada',
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const EntradaEstoque()),
-          ),
+          onPressed: () => showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Alert(
+                  content: 'Selecione se a entrada já está classificada ou não',
+                  title: 'Qual estoque é a entrada?',
+                  onCancel: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const EntradaEstoqueC()),
+                  ),
+                  onConfirm: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const EntradaEstoqueSC()),
+                  ),
+                  textOnCancel: "Classificado",
+                  textOnConfirm: "N Classificado",
+                );
+              }),
         ),
         const SizedBox(
           width: defaultPadding,

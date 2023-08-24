@@ -5,6 +5,7 @@ class EntradaLista {
   final ProdutorEntrada produtor;
   final double quantidade;
   final DateTime data;
+  final bool isClassifi;
 
   EntradaLista(
       {required this.id,
@@ -12,7 +13,8 @@ class EntradaLista {
       required this.embalagem,
       required this.quantidade,
       required this.produtor,
-      required this.data});
+      required this.data,
+      required this.isClassifi});
 
   factory EntradaLista.fromJson(Map<String, dynamic> json) {
     return EntradaLista(
@@ -22,6 +24,7 @@ class EntradaLista {
       fruta: FrutaEntrada.fromJson(json['Fruta']),
       embalagem: EmbalagemEntrada.fromJson(json['Embalagem']),
       produtor: ProdutorEntrada.fromJson(json['Produtor']),
+      isClassifi: json['IsClassifi'],
     );
   }
 }

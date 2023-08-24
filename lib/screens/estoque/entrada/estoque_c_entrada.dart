@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_final_fields, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,8 @@ import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/campo_retorno.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/componetes_gerais/future_drop_embalagem.dart';
+import 'package:maca_ipe/componetes_gerais/future_drop_fruta.dart';
 import 'package:maca_ipe/componetes_gerais/future_drop_produtor.dart';
 import 'package:maca_ipe/datas/embalagem.dart';
 import 'package:maca_ipe/datas/entradas.dart';
@@ -17,17 +19,14 @@ import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/estoque/entrada/tabela_entradas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../componetes_gerais/future_drop_embalagem.dart';
-import '../../../componetes_gerais/future_drop_fruta.dart';
-
-class EntradaEstoque extends StatefulWidget {
-  const EntradaEstoque({Key? key}) : super(key: key);
+class EntradaEstoqueC extends StatefulWidget {
+  const EntradaEstoqueC({Key? key}) : super(key: key);
 
   @override
-  State<EntradaEstoque> createState() => _EntradaEstoqueState();
+  State<EntradaEstoqueC> createState() => _EntradaEstoqueCState();
 }
 
-class _EntradaEstoqueState extends State<EntradaEstoque> {
+class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   DateTime _data = DateTime.now();
@@ -60,7 +59,7 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Entrada Produtos"),
+      appBar: CustomAppBar(title: "Entrada Produtos já Classificados"),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -361,12 +360,13 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
         embalagemId: _embalagemSelecionada!.id,
         quantidade: double.parse(_quant.value.text),
         produtorId: _produtorSelecionado!.id,
-        data: _data);
+        data: _data,
+        isClassifi: true);
 
     try {
       await client.from('Entradas').insert(entrada.toMap());
 
-      await processaEntradaSC(client, entrada.frutaId, entrada.produtorId,
+      await processaEntradaC(client, entrada.frutaId, entrada.produtorId,
           entrada.embalagemId, entrada.quantidade);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -383,18 +383,11 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
         MaterialPageRoute(builder: (context) => const TabelaEntrada()),
       );
     } on PostgrestException catch (error) {
-      if (error.message ==
-          'duplicate key value violates unique constraint "Entradas_pkey"') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text("Identificador já existente"),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(error.message),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ));
+
       setState(() {
         _isLoading = false;
       });

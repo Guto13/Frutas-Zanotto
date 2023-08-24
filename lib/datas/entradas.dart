@@ -5,6 +5,7 @@ class Entradas {
   final int produtorId;
   final double quantidade;
   final DateTime data;
+  final bool isClassifi;
 
   Entradas(
       {required this.id,
@@ -12,7 +13,8 @@ class Entradas {
       required this.embalagemId,
       required this.quantidade,
       required this.produtorId,
-      required this.data});
+      required this.data,
+      this.isClassifi = false});
 
   factory Entradas.fromJson(Map<String, dynamic> json) {
     return Entradas(
@@ -22,6 +24,7 @@ class Entradas {
       produtorId: json['ProdutorId'],
       quantidade: json['Quantidade'],
       data: DateTime.parse(json['Data']),
+      isClassifi: json['IsClassifi'],
     );
   }
 
@@ -32,6 +35,7 @@ class Entradas {
       'Quantidade': quantidade,
       'ProdutorId': produtorId,
       'Data': data.toIso8601String(),
+      'IsClassifi': isClassifi,
     };
   }
 }

@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/componetes_gerais/title_medium.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/classificacao/tabela_classifi.dart';
 
 class CabecalhoClassifi extends StatelessWidget {
   final Function(String) onSearch;
+  final GlobalKey<ScaffoldState> keyClassifi;
 
-  const CabecalhoClassifi({Key? key, required this.onSearch}) : super(key: key);
+  const CabecalhoClassifi(
+      {Key? key, required this.onSearch, required this.keyClassifi})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +20,16 @@ class CabecalhoClassifi extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                keyClassifi.currentState!.openDrawer();
+              }),
+          TitleMedium(title: 'Classificação', context: context),
+          SizedBox(
+              width: Responsive.isDesktop(context)
+                  ? defaultPadding
+                  : defaultPadding / 2),
           Expanded(
             child: TextField(
               onChanged: (value) {
@@ -46,7 +61,9 @@ class CabecalhoClassifi extends StatelessWidget {
               ),
             ),
           ),
-          const Spacer(),
+          Spacer(
+            flex: Responsive.isDesktop(context) ? 2 : 1,
+          ),
           BotaoPadrao(
             context: context,
             title: 'Lista',

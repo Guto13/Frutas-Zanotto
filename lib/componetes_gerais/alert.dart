@@ -3,14 +3,19 @@ import 'package:flutter/material.dart';
 class Alert extends StatelessWidget {
   final String title;
   final String content;
+  final String textOnCancel;
+  final String textOnConfirm;
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
 
-  const Alert({Key? key, 
+  const Alert({
+    Key? key,
     required this.title,
     required this.content,
     required this.onConfirm,
     required this.onCancel,
+    this.textOnCancel = 'Cancelar',
+    this.textOnConfirm = 'Confirmar',
   }) : super(key: key);
 
   @override
@@ -21,11 +26,11 @@ class Alert extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: onCancel,
-          child: const Text('Cancelar'),
+          child: Text(textOnCancel),
         ),
         TextButton(
           onPressed: onConfirm,
-          child: const Text('Confirmar'),
+          child: Text(textOnConfirm),
         ),
       ],
     );
