@@ -15,7 +15,6 @@ import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/romaneio/card_romaneio.dart';
 import 'package:maca_ipe/screens/romaneio/lista_romaneios.dart';
-import 'package:maca_ipe/screens/romaneio/romaneio_completo.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../componetes_gerais/future_drop_embalagem.dart';

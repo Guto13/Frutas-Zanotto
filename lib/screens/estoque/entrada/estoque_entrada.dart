@@ -72,8 +72,6 @@ class _EntradaEstoqueState extends State<EntradaEstoque> {
                 ),
                 const Spacer(),
                 BotaoPadrao(
-                    context: context, title: 'Editar', onPressed: () {}),
-                BotaoPadrao(
                   context: context,
                   title: 'Entradas',
                   onPressed: () => Navigator.push(

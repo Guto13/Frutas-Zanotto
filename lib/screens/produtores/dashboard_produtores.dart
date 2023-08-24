@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/produtor.dart';
+import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/screens/produtores/cabecalho_produtores.dart';
 import 'package:maca_ipe/screens/produtores/edit_produtores.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -25,18 +26,6 @@ class _DashboardProdutoresState extends State<DashboardProdutores> {
     });
   }
 
-  Future<List<Produtor>> buscarProdutores(SupabaseClient client) async {
-    final produtoresJson =
-        await client.from('Produtor').select().order('Nome').order('Sobrenome');
-
-    return parseProdutores(produtoresJson);
-  }
-
-  List<Produtor> parseProdutores(List<dynamic> responseBody) {
-    List<Produtor> produtores =
-        responseBody.map((e) => Produtor.fromJson(e)).toList();
-    return produtores;
-  }
 
   @override
   Widget build(BuildContext context) {

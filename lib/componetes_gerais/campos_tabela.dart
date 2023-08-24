@@ -11,11 +11,14 @@ class CampoTabelaCabecalho extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(defaultPadding),
       child: TableCell(
-          child: Center(
-              child: SelectableText(
-        value,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ))),
+          child: SizedBox(
+        width: double.infinity,
+        child: Center(
+            child: SelectableText(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        )),
+      )),
     );
   }
 }
@@ -30,10 +33,13 @@ class CampoTabela extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(defaultPadding),
       child: TableCell(
-          child: Center(
-              child: SelectableText(
-        value,
-      ))),
+          child: SizedBox(
+            width: double.infinity,
+            child: Center(
+                child: SelectableText(
+                  value,
+                )),
+          )),
     );
   }
 }

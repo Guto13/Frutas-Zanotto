@@ -4,7 +4,9 @@ import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/romaneio_lista.dart';
+import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_completo.dart';
+import 'package:maca_ipe/screens/romaneio/romaneio_produtor/romaneio_produtor.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ListaRomaneios extends StatefulWidget {
@@ -23,22 +25,6 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
     setState(() {
       _pesquisa = novaPesquisa;
     });
-  }
-
-  Future<List<RomaneioLista>> buscarEstoqueSC(SupabaseClient client) async {
-    final romaneioJson = await client
-        .from('Romaneio')
-        .select(
-            'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Data, Produtor(id, Nome, Sobrenome), TFruta')
-        .order('Data');
-
-    return parseRomaneioJson(romaneioJson);
-  }
-
-  List<RomaneioLista> parseRomaneioJson(List<dynamic> responseBody) {
-    List<RomaneioLista> romaneio =
-        responseBody.map((e) => RomaneioLista.fromJson(e)).toList();
-    return romaneio;
   }
 
   @override
@@ -85,7 +71,14 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
                   ),
                   const Spacer(),
                   BotaoPadrao(
-                      context: context, title: 'P/ Produtor', onPressed: () {}),
+                    context: context,
+                    title: 'Por Produtor',
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RomaneioProdutor()),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: defaultPadding),
@@ -100,7 +93,7 @@ class _ListaRomaneiosState extends State<ListaRomaneios> {
                 child: SizedBox(
                   width: double.infinity,
                   child: FutureBuilder<List<RomaneioLista>>(
-                      future: buscarEstoqueSC(client),
+                      future: buscarRomaneioLista(client),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

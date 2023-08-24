@@ -18,6 +18,7 @@ import 'package:maca_ipe/datas/palete_pa_lista.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/datas/romaneio.dart';
 import 'package:maca_ipe/datas/romaneio_cp.dart';
+import 'package:maca_ipe/datas/romaneio_lista.dart';
 import 'package:maca_ipe/datas/romaneio_m.dart';
 import 'package:maca_ipe/datas/romaneio_pa.dart';
 import 'package:supabase/supabase.dart';
@@ -644,20 +645,341 @@ List<PaleteO> parsePaleteOJson(List<dynamic> responseBody) {
   return paleteO;
 }
 
-
 //Consulta de estoque
 Future<List<EstoqueLista>> buscarEstoqueSC(SupabaseClient client) async {
-    final estoqueJson = await client
-        .from("EstoqueSC")
-        .select(
-            'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)')
-        .order('Quantidade');
+  final estoqueJson = await client
+      .from("EstoqueSC")
+      .select(
+          'id, Fruta:FrutaId(id, Nome, Variedade), Embalagem(id, Nome), Quantidade, Produtor(id, Nome, Sobrenome)')
+      .order('Quantidade');
 
-    return parseEstoqueSC(estoqueJson);
+  return parseEstoqueSC(estoqueJson);
+}
+
+List<EstoqueLista> parseEstoqueSC(List<dynamic> responseBody) {
+  List<EstoqueLista> estoque =
+      responseBody.map((e) => EstoqueLista.fromJson(e)).toList();
+  return estoque;
+}
+
+//Busca Produtores
+Future<List<Produtor>> buscarProdutores(SupabaseClient client) async {
+  final produtoresJson =
+      await client.from('Produtor').select().order('Nome').order('Sobrenome');
+
+  return parseProdutores(produtoresJson);
+}
+
+List<Produtor> parseProdutores(List<dynamic> responseBody) {
+  List<Produtor> produtores =
+      responseBody.map((e) => Produtor.fromJson(e)).toList();
+  return produtores;
+}
+
+//Buscar Romaneio Lista
+
+Future<List<RomaneioLista>> buscarRomaneioLista(SupabaseClient client) async {
+  final romaneioJson = await client
+      .from('Romaneio')
+      .select(
+          'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Data, Produtor(id, Nome, Sobrenome), TFruta')
+      .order('Data');
+
+  return parseRomaneioJson(romaneioJson);
+}
+
+List<RomaneioLista> parseRomaneioJson(List<dynamic> responseBody) {
+  List<RomaneioLista> romaneio =
+      responseBody.map((e) => RomaneioLista.fromJson(e)).toList();
+  return romaneio;
+}
+
+//Busca romaneio lista por produtor
+Future<List<RomaneioLista>> buscarRomaneioListaProdutor(
+    SupabaseClient client, int id) async {
+  final romaneioJson = await client
+      .from('Romaneio')
+      .select(
+          'id, Fruta(id, Nome, Variedade), Embalagem(id, Nome), Data, Produtor(id, Nome, Sobrenome), TFruta')
+      .eq('ProdutorId', id)
+      .order('Data');
+
+  return parseRomaneioJson(romaneioJson);
+}
+
+//recebendo dados para romaneio M
+Future<List<RomaneioM>> buscarRomaneioM(SupabaseClient client, int id) async {
+  final romaneioMJson =
+      await client.from('RomaneioM').select().eq('RomaneioId', id);
+
+  return parseRomaneioMJson(romaneioMJson);
+}
+
+List<RomaneioM> parseRomaneioMJson(List<dynamic> responseBody) {
+  List<RomaneioM> romaneioM =
+      responseBody.map((e) => RomaneioM.fromJson(e)).toList();
+  return romaneioM;
+}
+
+List<CalibreM> parseCalibreMPRomaneio(RomaneioM r) {
+  List<CalibreM> calibrem = [
+    CalibreM(calibre: '220', cat1: r.c2201, cat2: 0),
+    CalibreM(calibre: '198', cat1: r.c1981, cat2: 0),
+    CalibreM(calibre: '180', cat1: r.c1801, cat2: r.c1802),
+    CalibreM(calibre: '165', cat1: r.c1651, cat2: r.c1652),
+    CalibreM(calibre: '150', cat1: r.c1501, cat2: r.c1502),
+    CalibreM(calibre: '135', cat1: r.c1351, cat2: r.c1352),
+    CalibreM(calibre: '120', cat1: r.c1201, cat2: r.c1202),
+    CalibreM(calibre: '110', cat1: r.c1101, cat2: r.c1102),
+    CalibreM(calibre: '100', cat1: r.c1001, cat2: r.c1002),
+    CalibreM(calibre: '90', cat1: r.c901, cat2: r.c902),
+    CalibreM(calibre: '80', cat1: r.c801, cat2: r.c802),
+    CalibreM(calibre: '70', cat1: r.c701, cat2: r.c702),
+    CalibreM(calibre: 'Comercial', cat1: 0, cat2: r.comercial),
+    CalibreM(
+        calibre: 'Total',
+        cat1: r.c2201 +
+            r.c1981 +
+            r.c1801 +
+            r.c1651 +
+            r.c1501 +
+            r.c1351 +
+            r.c1201 +
+            r.c1101 +
+            r.c1001 +
+            r.c901 +
+            r.c801 +
+            r.c701,
+        cat2: r.c1802 +
+            r.c1652 +
+            r.c1502 +
+            r.c1352 +
+            r.c1202 +
+            r.c1102 +
+            r.c1002 +
+            r.c902 +
+            r.c802 +
+            r.c702 +
+            r.comercial),
+  ];
+  return calibrem;
+}
+
+List<List<CalibreM>> addTotaisCalibreM(List<List<CalibreM>> calibresGerais) {
+  List<int> totaisc1 = List.generate(14, (_) => 0);
+
+  List<int> totaisc2 = List.generate(14, (_) => 0);
+
+  for (var ele in calibresGerais) {
+    for (var i = 0; i < ele.length; i++) {
+      totaisc1[i] += ele[i].cat1;
+      totaisc2[i] += ele[i].cat2;
+    }
+  }
+  List<CalibreM> calibreM = [
+    CalibreM(
+      calibre: '220',
+      cat1: totaisc1[0],
+      cat2: totaisc2[0],
+    ),
+    CalibreM(
+      calibre: '198',
+      cat1: totaisc1[1],
+      cat2: totaisc2[1],
+    ),
+    CalibreM(
+      calibre: '180',
+      cat1: totaisc1[2],
+      cat2: totaisc2[2],
+    ),
+    CalibreM(
+      calibre: '165',
+      cat1: totaisc1[3],
+      cat2: totaisc2[3],
+    ),
+    CalibreM(
+      calibre: '150',
+      cat1: totaisc1[4],
+      cat2: totaisc2[4],
+    ),
+    CalibreM(
+      calibre: '135',
+      cat1: totaisc1[5],
+      cat2: totaisc2[5],
+    ),
+    CalibreM(
+      calibre: '120',
+      cat1: totaisc1[6],
+      cat2: totaisc2[6],
+    ),
+    CalibreM(
+      calibre: '110',
+      cat1: totaisc1[7],
+      cat2: totaisc2[7],
+    ),
+    CalibreM(
+      calibre: '100',
+      cat1: totaisc1[8],
+      cat2: totaisc2[8],
+    ),
+    CalibreM(
+      calibre: '90',
+      cat1: totaisc1[9],
+      cat2: totaisc2[9],
+    ),
+    CalibreM(
+      calibre: '80',
+      cat1: totaisc1[10],
+      cat2: totaisc2[10],
+    ),
+    CalibreM(
+      calibre: '70',
+      cat1: totaisc1[11],
+      cat2: totaisc2[11],
+    ),
+    CalibreM(calibre: 'Comercial', cat1: totaisc1[12], cat2: totaisc2[12]),
+    CalibreM(
+      calibre: 'Total',
+      cat1: totaisc1[13],
+      cat2: totaisc2[13],
+    ),
+  ];
+
+  calibresGerais.add(calibreM);
+
+  return calibresGerais;
+}
+
+//recebendo dados para romaneio CP
+
+Future<List<RomaneioCp>> buscarRomaneioCp(SupabaseClient client, int id) async {
+  final romaneioCpJson =
+      await client.from('RomaneioCP').select().eq('RomaneioId', id);
+
+  return parseRomaneioCpJson(romaneioCpJson);
+}
+
+List<RomaneioCp> parseRomaneioCpJson(List<dynamic> responseBody) {
+  List<RomaneioCp> romaneioCp =
+      responseBody.map((e) => RomaneioCp.fromJson(e)).toList();
+  return romaneioCp;
+}
+
+List<CalibreCp> parseCalibreCpPRomaneio(RomaneioCp rcp) {
+  List<CalibreCp> calibrecp = [
+    CalibreCp(calibre: 'GG', quant: rcp.gg),
+    CalibreCp(calibre: 'G', quant: rcp.g),
+    CalibreCp(calibre: 'M', quant: rcp.m),
+    CalibreCp(calibre: 'P', quant: rcp.p),
+    CalibreCp(calibre: 'PP', quant: rcp.pp),
+    CalibreCp(calibre: 'Cat 2', quant: rcp.cat2),
+    CalibreCp(
+        calibre: 'Total',
+        quant: rcp.gg + rcp.g + rcp.m + rcp.p + rcp.pp + rcp.cat2),
+  ];
+  return calibrecp;
+}
+
+List<List<CalibreCp>> addTotaisCalibreCP(List<List<CalibreCp>> calibresGerais) {
+  List<int> totais = List.generate(9, (_) => 0);
+
+  for (var ele in calibresGerais) {
+    for (var i = 0; i < ele.length; i++) {
+      totais[i] += ele[i].quant;
+    }
   }
 
-  List<EstoqueLista> parseEstoqueSC(List<dynamic> responseBody) {
-    List<EstoqueLista> estoque =
-        responseBody.map((e) => EstoqueLista.fromJson(e)).toList();
-    return estoque;
+  List<CalibreCp> calibreCP = [
+    CalibreCp(calibre: 'GG', quant: totais[0]),
+    CalibreCp(calibre: 'G', quant: totais[1]),
+    CalibreCp(calibre: 'M', quant: totais[2]),
+    CalibreCp(calibre: 'P', quant: totais[3]),
+    CalibreCp(calibre: 'PP', quant: totais[4]),
+    CalibreCp(calibre: 'Cat 2', quant: totais[5]),
+    CalibreCp(calibre: 'Total', quant: totais[6]),
+  ];
+
+  calibresGerais.add(calibreCP);
+
+  return calibresGerais;
+}
+
+//recebendo dados para romaneio PA
+
+Future<List<RomaneioPa>> buscarRomaneioPa(SupabaseClient client, int id) async {
+  final romaneioPaJson =
+      await client.from('RomaneioPA').select().eq('RomaneioId', id);
+
+  return parseRomaneioPaJson(romaneioPaJson);
+}
+
+List<RomaneioPa> parseRomaneioPaJson(List<dynamic> responseBody) {
+  List<RomaneioPa> romaneioPa =
+      responseBody.map((e) => RomaneioPa.fromJson(e)).toList();
+  return romaneioPa;
+}
+
+List<CalibreCp> parseCalibrePaPRomaneio(RomaneioPa rpa) {
+  List<CalibreCp> calibrecp = [
+    CalibreCp(calibre: '45', quant: rpa.c45),
+    CalibreCp(calibre: '40', quant: rpa.c40),
+    CalibreCp(calibre: '36', quant: rpa.c36),
+    CalibreCp(calibre: '32', quant: rpa.c32),
+    CalibreCp(calibre: '30', quant: rpa.c30),
+    CalibreCp(calibre: '28', quant: rpa.c28),
+    CalibreCp(calibre: '24', quant: rpa.c24),
+    CalibreCp(calibre: '22', quant: rpa.c22),
+    CalibreCp(calibre: '20', quant: rpa.c20),
+    CalibreCp(calibre: '18', quant: rpa.c18),
+    CalibreCp(calibre: '14', quant: rpa.c14),
+    CalibreCp(calibre: '12', quant: rpa.c12),
+    CalibreCp(calibre: 'Cat 2', quant: rpa.cat2),
+    CalibreCp(
+        calibre: 'Total',
+        quant: rpa.c45 +
+            rpa.c40 +
+            rpa.c36 +
+            rpa.c32 +
+            rpa.c30 +
+            rpa.c28 +
+            rpa.c24 +
+            rpa.c22 +
+            rpa.c20 +
+            rpa.c18 +
+            rpa.c14 +
+            rpa.c12 +
+            rpa.cat2),
+  ];
+  return calibrecp;
+}
+
+List<List<CalibreCp>> addTotaisCalibrePA(List<List<CalibreCp>> calibresGerais) {
+  List<int> totais = List.generate(15, (_) => 0);
+
+  for (var ele in calibresGerais) {
+    for (var i = 0; i < ele.length; i++) {
+      totais[i] += ele[i].quant;
+    }
   }
+
+  List<CalibreCp> calibreCP = [
+    CalibreCp(calibre: '45', quant: totais[0]),
+    CalibreCp(calibre: '40', quant: totais[1]),
+    CalibreCp(calibre: '36', quant: totais[2]),
+    CalibreCp(calibre: '32', quant: totais[3]),
+    CalibreCp(calibre: '30', quant: totais[4]),
+    CalibreCp(calibre: '28', quant: totais[5]),
+    CalibreCp(calibre: '24', quant: totais[6]),
+    CalibreCp(calibre: '22', quant: totais[7]),
+    CalibreCp(calibre: '20', quant: totais[8]),
+    CalibreCp(calibre: '18', quant: totais[9]),
+    CalibreCp(calibre: '14', quant: totais[10]),
+    CalibreCp(calibre: '12', quant: totais[11]),
+    CalibreCp(calibre: 'Cat 2', quant: totais[12]),
+    CalibreCp(calibre: 'Total', quant: totais[13]),
+  ];
+
+  calibresGerais.add(calibreCP);
+
+  return calibresGerais;
+}
