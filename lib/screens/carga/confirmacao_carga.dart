@@ -6,7 +6,9 @@ import 'package:maca_ipe/componetes_gerais/botao_padrao.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/carga.dart';
 import 'package:maca_ipe/datas/palete.dart';
-import 'package:maca_ipe/screens/carga/palete_demonstracao.dart';
+import 'package:maca_ipe/datas/palete_fruta.dart';
+import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/screens/carga/palete_demonstra%C3%A7%C3%A3o.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ConfirmacaoCarga extends StatefulWidget {
@@ -37,7 +39,26 @@ class _ConfirmacaoCargaState extends State<ConfirmacaoCarga> {
                   children: [
                     ...widget.paletes
                         .map(
-                          (e) => PaleteDemonstracao(palete: e),
+                          (e) => FutureBuilder<List<PaleteFrutaLista>>(
+                            future: buscarPaleteFruta(client, e.id),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                              if (snapshot.hasData) {
+                                return PaleteDemontracao(
+                                  paleteFruta: snapshot.data!,
+                                );
+                              } else {
+                                return const Center(
+                                  child: Text('Erro ao retornar dados'),
+                                );
+                              }
+                            },
+                          ),
                         )
                         .toList(),
                     const SizedBox(
@@ -65,12 +86,11 @@ class _ConfirmacaoCargaState extends State<ConfirmacaoCarga> {
           .insert(carga.toMap())
           .select('id, Data, Motorista');
 
-      widget.paletes.map(
-        (e) async {
-          await client.from('Palete').update(
-              {'Carga': cargaData[0]['id'], 'Carregado': true}).eq('id', e.id);
-        },
-      ).toList();
+      for (var e in widget.paletes) {
+        await client.from('Palete').update(
+              {'CargaId': cargaData[0]['id'], 'Carregado': true}).eq('id', e.id);
+      }
+    
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

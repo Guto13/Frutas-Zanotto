@@ -40,9 +40,10 @@ class _DashboardRomaneioState extends State<DashboardRomaneio> {
       child: GridView.count(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
+        childAspectRatio: 2.5,
         crossAxisCount: 3,
-        crossAxisSpacing: defaultPadding,
-        mainAxisSpacing: defaultPadding,
+        crossAxisSpacing: defaultPadding*2,
+        mainAxisSpacing: defaultPadding*2,
         children: [
           ...buttons
               .map((e) => ButtonTextDefault(

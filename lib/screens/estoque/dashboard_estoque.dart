@@ -22,7 +22,7 @@ class DashboardEstoque extends StatefulWidget {
 
 class _DashboardEstoqueState extends State<DashboardEstoque> {
   final client = Supabase.instance.client;
-  List<EstoqueLista> estoque = [];
+  List<EstoqueListaC> estoque = [];
   String tabela = 'EstoqueSC';
   String _pesquisa = '';
   bool _isChecked = false;
@@ -102,8 +102,8 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
             ),
             SizedBox(
               width: double.infinity,
-              child: FutureBuilder<List<EstoqueLista>>(
-                  future: buscarEstoque(client, tabela),
+              child: FutureBuilder<List<EstoqueListaC>>(
+                  future: buscarEstoqueC(client),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -116,15 +116,6 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                           .where(
                             (est) =>
                                 est.fruta.nome
-                                    .toLowerCase()
-                                    .contains(_pesquisa.toLowerCase()) ||
-                                est.produtor.nome
-                                    .toLowerCase()
-                                    .contains(_pesquisa.toLowerCase()) ||
-                                est.produtor.sobrenome
-                                    .toLowerCase()
-                                    .contains(_pesquisa.toLowerCase()) ||
-                                est.embalagem.nome
                                     .toLowerCase()
                                     .contains(_pesquisa.toLowerCase()) ||
                                 est.fruta.variedade
@@ -160,17 +151,12 @@ class _DashboardEstoqueState extends State<DashboardEstoque> {
                                 horizontalMargin: 20.0,
                                 columns: [
                                   columnTable('Fruta'),
-                                  columnTable('Produtor'),
-                                  columnTable('Embalagem'),
                                   columnTable('Quantidade'),
                                 ],
                                 rows: estoque.map((e) {
                                   return DataRow(cells: [
                                     columnData(
                                         '${e.fruta.nome} ${e.fruta.variedade}'),
-                                    columnData(
-                                        '${e.produtor.nome} ${e.produtor.sobrenome}'),
-                                    columnData(e.embalagem.nome),
                                     columnData(e.quantidade.toString()),
                                   ]);
                                 }).toList(),

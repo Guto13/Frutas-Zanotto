@@ -13,7 +13,7 @@ class Palete {
   factory Palete.fromJson(Map<String, dynamic> json) {
     return Palete(
       id: json['id'],
-      carga: json['Carga'],
+      carga: json['CargaId'],
       data: DateTime.parse(json['Data']),
       carregado: json['Carregado'],
     );
@@ -21,7 +21,7 @@ class Palete {
 
   Map<String, dynamic> toMap() {
     return {
-      'Carga': carga,
+      'CargaId': carga,
       'Data': data.toIso8601String(),
       'Carregado': carregado,
     };

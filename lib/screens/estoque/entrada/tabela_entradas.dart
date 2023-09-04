@@ -148,8 +148,8 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
       double quantidade, bool isClassifi) async {
     if (isClassifi) {
       try {
-        await excluirEntradaC(
-            client, frutaId, produtorId, embalagemId, quantidade, id, context);
+        /*await excluirEntradaC(
+            client, frutaId, produtorId, embalagemId, quantidade, id, context);*/
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

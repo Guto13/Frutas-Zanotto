@@ -32,3 +32,38 @@ class Estoque {
     };
   }
 }
+
+class EstoqueC {
+  final int id;
+  final int frutaId;
+  final int quantidade;
+  final String calibre;
+  final String categoria;
+
+  EstoqueC({
+    required this.id,
+    required this.frutaId,
+    required this.quantidade,
+    required this.calibre,
+    required this.categoria,
+  });
+
+  factory EstoqueC.fromJson(Map<String, dynamic> json) {
+    return EstoqueC(
+      id: json['id'],
+      frutaId: json['FrutaId'],
+      quantidade: json['Quantidade'],
+      calibre: json['Calibre'],
+      categoria: json['Categoria'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'FrutaId': frutaId,
+      'Quantidade': quantidade,
+      'Calibre': calibre,
+      'Categoria': categoria,
+    };
+  }
+}

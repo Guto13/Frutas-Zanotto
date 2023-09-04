@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
-import 'package:maca_ipe/datas/statics.dart';
 import 'package:pie_chart/pie_chart.dart';
 
 class Chart extends StatefulWidget {
-  const Chart({Key? key, required this.statics}) : super(key: key);
+  const Chart({Key? key, required this.paletes}) : super(key: key);
 
-  final StaticsPaletes statics;
+  final Map<String, double> paletes;
 
   @override
   State<Chart> createState() => _ChartState();
@@ -17,11 +16,9 @@ class _ChartState extends State<Chart> {
 
   @override
   Widget build(BuildContext context) {
-    totPaletes = widget.statics.maca +
-        widget.statics.ameixa +
-        widget.statics.pessego +
-        widget.statics.pera +
-        widget.statics.caqui;
+    for (var value in widget.paletes.values) {
+      totPaletes += value;
+    }
     return Column(
       children: [
         Text(
@@ -36,7 +33,7 @@ class _ChartState extends State<Chart> {
           height: defaultPadding * 3,
         ),
         PieChart(
-          dataMap: widget.statics.toMap(),
+          dataMap: widget.paletes,
           animationDuration: const Duration(milliseconds: 800),
           chartType: ChartType.disc,
           chartValuesOptions:

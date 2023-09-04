@@ -29,8 +29,9 @@ class EntradaEstoqueC extends StatefulWidget {
 class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  DateTime _data = DateTime.now();
+  final DateTime _data = DateTime.now();
   final _quant = TextEditingController();
+  final _calibre = TextEditingController();
 
   Fruta? _frutaSelecionada;
   Embalagem? _embalagemSelecionada;
@@ -326,6 +327,42 @@ class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
                                   const SizedBox(
                                     height: defaultPadding * 4,
                                   ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: TextFormField(
+                                          controller: _calibre,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Calibre',
+                                          ),
+                                          validator: (value) {
+                                            if (value?.isEmpty ?? true) {
+                                              return 'Por favor, preencha este campo';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: defaultPadding * 4,
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: TextFormField(
+                                          readOnly: true,
+                                          initialValue: 'Cat1',
+                                          decoration: const InputDecoration(
+                                            labelText: 'Categoria',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: defaultPadding * 4,
+                                  ),
                                   Center(
                                     child: BotaoPadrao(
                                         context: context,
@@ -364,10 +401,8 @@ class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
         isClassifi: true);
 
     try {
-      await client.from('Entradas').insert(entrada.toMap());
-
-      await processaEntradaC(client, entrada.frutaId, entrada.produtorId,
-          entrada.embalagemId, entrada.quantidade);
+      await processaEntradaEstoqueC(client, entrada, context,
+          _frutaSelecionada!.nomeVariedade, _calibre.text, 'Cat1');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

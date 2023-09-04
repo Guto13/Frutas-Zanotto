@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
-import 'package:maca_ipe/datas/statics.dart';
 import 'package:maca_ipe/screens/paletes/chart.dart';
 
 class PaletesStatics extends StatelessWidget {
   const PaletesStatics({
     Key? key,
-    required this.statics,
+    required this.paletes,
   }) : super(key: key);
 
-  final StaticsPaletes statics;
+  final Map<String, double> paletes;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,7 @@ class PaletesStatics extends StatelessWidget {
           ),
           const SizedBox(height: defaultPadding),
           Chart(
-            statics: statics,
+            paletes: paletes,
           )
         ],
       ),

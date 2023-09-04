@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maca_ipe/componetes_gerais/app_bar.dart';
-import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/componetes_gerais/left_menu.dart';
 import 'package:maca_ipe/screens/classificacao/cabecalho_classifi.dart';
 import 'package:maca_ipe/screens/classificacao/cadastro_classifi.dart';

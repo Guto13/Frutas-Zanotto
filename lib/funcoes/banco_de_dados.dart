@@ -4,22 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/carga.dart';
 import 'package:maca_ipe/datas/embalagem.dart';
+import 'package:maca_ipe/datas/entradas.dart';
 import 'package:maca_ipe/datas/estoque.dart';
 import 'package:maca_ipe/datas/estoque_lista.dart';
 import 'package:maca_ipe/datas/fruta.dart';
 import 'package:maca_ipe/datas/palete.dart';
-import 'package:maca_ipe/datas/palete_cp.dart';
-import 'package:maca_ipe/datas/palete_cp_lista.dart';
-import 'package:maca_ipe/datas/palete_m.dart';
-import 'package:maca_ipe/datas/palete_m_lista.dart';
-import 'package:maca_ipe/datas/palete_o.dart';
-import 'package:maca_ipe/datas/palete_pa.dart';
-import 'package:maca_ipe/datas/palete_pa_lista.dart';
+import 'package:maca_ipe/datas/palete_fruta.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/datas/romaneio.dart';
 import 'package:maca_ipe/datas/romaneio_cp.dart';
 import 'package:maca_ipe/datas/romaneio_lista.dart';
 import 'package:maca_ipe/datas/romaneio_m.dart';
+import 'package:maca_ipe/datas/romaneio_o.dart';
 import 'package:maca_ipe/datas/romaneio_pa.dart';
 import 'package:supabase/supabase.dart';
 
@@ -37,13 +33,13 @@ Future<Map<String, dynamic>?> consultaEstoqueSC(SupabaseClient supabase,
 }
 
 Future<Map<String, dynamic>?> consultaEstoqueC(SupabaseClient supabase,
-    int frutaId, int produtorId, int embalagemId) async {
+    int frutaId, String calibre, String categoria) async {
   final response = await supabase
       .from('EstoqueC')
       .select('*')
       .eq('FrutaId', frutaId)
-      .eq('ProdutorId', produtorId)
-      .eq('EmbalagemId', embalagemId);
+      .eq('Calibre', calibre)
+      .eq('Categoria', categoria);
 
   return response.length > 0 ? response[0] : null;
 }
@@ -55,7 +51,7 @@ Future<void> insereEstoqueSC(SupabaseClient supabase, Estoque estoque) async {
   } catch (e) {}
 }
 
-Future<void> insereEstoqueC(SupabaseClient supabase, Estoque estoque) async {
+Future<void> insereEstoqueC(SupabaseClient supabase, EstoqueC estoque) async {
   try {
     await supabase.from('EstoqueC').insert(estoque.toMap());
   } catch (e) {}
@@ -84,13 +80,37 @@ Future<void> atualizaEstoqueSC(SupabaseClient supabase, int frutaId,
 }
 
 Future<void> atualizaEstoqueC(SupabaseClient supabase, int frutaId,
-    int produtorId, int embalagemId, double quantidade) async {
+    double quantidade, String calibre, String categoria) async {
   try {
     await supabase.from('EstoqueC').update({'Quantidade': quantidade}).match({
       'FrutaId': frutaId,
-      'ProdutorId': produtorId,
-      'EmbalagemId': embalagemId
+      'Calibre': calibre,
+      'Categoria': categoria,
     });
+  } catch (e) {}
+}
+
+Future<void> deletaEstoqueC(SupabaseClient supabase, EstoqueC estoque) async {
+  try {
+    final response = await supabase
+        .from('EstoqueC')
+        .select('Quantidade, id')
+        .eq('FrutaId', estoque.frutaId)
+        .eq('Calibre', estoque.calibre)
+        .eq('Categoria', estoque.categoria);
+
+    int novaQuant = response[0]['Quantidade'] - estoque.quantidade;
+
+    if (novaQuant > 0) {
+      await atualizaEstoqueC(
+          supabase,
+          estoque.frutaId,
+          double.parse(novaQuant.toString()),
+          estoque.calibre,
+          estoque.categoria);
+    } else {
+      await supabase.from('EstoqueC').delete().eq('id', response[0]['id']);
+    }
   } catch (e) {}
 }
 
@@ -110,31 +130,6 @@ Future<void> processaEntradaSC(SupabaseClient supabase, int frutaId,
     // Se o item não existir no estoque, cria um novo registro
 
     await insereEstoqueSC(
-        supabase,
-        Estoque(
-            id: 1,
-            frutaId: frutaId,
-            embalagemId: embalagemId,
-            quantidade: quantidade,
-            produtorId: produtorId));
-  }
-}
-
-Future<void> processaEntradaC(SupabaseClient supabase, int frutaId,
-    int produtorId, int embalagemId, double quantidade) async {
-  Map<String, dynamic>? itemEstoque =
-      await consultaEstoqueC(supabase, frutaId, produtorId, embalagemId);
-
-  if (itemEstoque != null) {
-    // Se o item existir no estoque, atualiza a quantidade
-    int quantidadeAntiga = itemEstoque['Quantidade'];
-    double novaQuantidade = quantidadeAntiga + quantidade;
-    await atualizaEstoqueC(
-        supabase, frutaId, produtorId, embalagemId, novaQuantidade);
-  } else {
-    // Se o item não existir no estoque, cria um novo registro
-
-    await insereEstoqueC(
         supabase,
         Estoque(
             id: 1,
@@ -187,39 +182,38 @@ Future<void> excluirEntradaSC(
   }
 }
 
-Future<void> excluirEntradaC(
-    SupabaseClient supabase,
-    int frutaId,
-    int produtorId,
-    int embalagemId,
-    double quantidade,
-    int id,
-    BuildContext context) async {
-  Map<String, dynamic>? itemEstoque =
-      await consultaEstoqueC(supabase, frutaId, produtorId, embalagemId);
+//Função para lidar com EstoqueC
+Future<void> processaEntradaEstoqueC(
+    SupabaseClient client,
+    Entradas entrada,
+    BuildContext context,
+    String nomeFruta,
+    String calibre,
+    String categoria) async {
+  try {
+    await client.from('Entradas').insert(entrada.toMap());
 
-  int quantidadeAntiga = itemEstoque!['Quantidade'];
-  double novaQuantidade = quantidadeAntiga - quantidade;
-  if (novaQuantidade >= 0) {
-    await atualizaEstoqueC(
-        supabase, frutaId, produtorId, embalagemId, novaQuantidade);
+    Romaneio romaneio = Romaneio(
+        id: 1,
+        frutaId: entrada.frutaId,
+        embalagemId: entrada.embalagemId,
+        tFruta: 'RomaneioO',
+        data: entrada.data,
+        produtorId: entrada.produtorId);
 
-    await supabase.from('Entradas').delete().eq('id', id);
+    RomaneioO romaneioO = RomaneioO(
+        id: 1,
+        romaneioId: 1,
+        nome: nomeFruta,
+        quant: int.parse(entrada.quantidade.toString()));
 
+    await cadastrarRomaneioO(
+        client, romaneio, romaneioO, context, calibre, categoria);
+  } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
-          "Entrada excluida com sucesso",
-          style: TextStyle(color: textColor),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          "Estoque negativo, impossível excluir a entrada",
+          "Erro ao cadastrar",
           style: TextStyle(color: textColor),
         ),
         backgroundColor: Theme.of(context).colorScheme.error,
@@ -259,6 +253,73 @@ Future<void> excluirClassifi(
   );
 }
 
+// Função para lidar com o cadastro de novos romaneios de outros tipos de frutas
+Future<void> cadastrarRomaneioO(
+    SupabaseClient supabase,
+    Romaneio romaneio,
+    RomaneioO romaneioO,
+    BuildContext context,
+    String calibre,
+    String categoria) async {
+  try {
+    final response =
+        await supabase.from('Romaneio').insert(romaneio.toMap()).select('id');
+    try {
+      RomaneioO romaneiCad = RomaneioO(
+        id: 1,
+        romaneioId: response[0]['id'],
+        nome: romaneioO.nome,
+        quant: romaneioO.quant,
+      );
+
+      await supabase.from('RomaneioO').insert(romaneiCad.toMap());
+
+      Map<String, dynamic>? itemEstoque = await consultaEstoqueC(
+          supabase, romaneio.frutaId, calibre, categoria);
+
+      if (itemEstoque != null) {
+        // Se o item existir no estoque, atualiza a quantidade
+        int quantidadeAntiga = itemEstoque['Quantidade'];
+        int novaQuantidade = quantidadeAntiga + romaneioO.quant;
+        await atualizaEstoqueC(supabase, romaneio.frutaId,
+            double.parse(novaQuantidade.toString()), calibre, categoria);
+      } else {
+        // Se o item não existir no estoque, cria um novo registro
+
+        await insereEstoqueC(
+            supabase,
+            EstoqueC(
+              id: 1,
+              frutaId: romaneio.frutaId,
+              quantidade: romaneioO.quant,
+              calibre: calibre,
+              categoria: categoria,
+            ));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+            style: const TextStyle(color: textColor),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
 // Função para lidar com o cadastro de novos romaneios de maçã
 Future<void> cadastrarRomaneioM(SupabaseClient supabase, Romaneio romaneio,
     RomaneioM romaneioM, BuildContext context) async {
@@ -294,6 +355,67 @@ Future<void> cadastrarRomaneioM(SupabaseClient supabase, Romaneio romaneio,
           comercial: romaneioM.comercial);
 
       await supabase.from('RomaneioM').insert(romaneiCad.toMap());
+
+      List<CalibreM> calibreM = parseCalibreMPRomaneio(romaneiCad);
+
+      for (var element in calibreM) {
+        if (element.cat1 > 0 && element.calibre != 'Total') {
+          Map<String, dynamic>? itemEstoque = await consultaEstoqueC(
+              supabase, romaneio.frutaId, element.calibre, 'Cat1');
+
+          if (itemEstoque != null) {
+            // Se o item existir no estoque, atualiza a quantidade
+            int quantidadeAntiga = itemEstoque['Quantidade'];
+            int novaQuantidade = quantidadeAntiga + element.cat1;
+            await atualizaEstoqueC(
+                supabase,
+                romaneio.frutaId,
+                double.parse(novaQuantidade.toString()),
+                element.calibre,
+                'Cat1');
+          } else {
+            // Se o item não existir no estoque, cria um novo registro
+
+            await insereEstoqueC(
+                supabase,
+                EstoqueC(
+                  id: 1,
+                  frutaId: romaneio.frutaId,
+                  quantidade: element.cat1,
+                  calibre: element.calibre,
+                  categoria: 'Cat1',
+                ));
+          }
+        }
+        if (element.cat2 > 0 && element.calibre != 'Total') {
+          Map<String, dynamic>? itemEstoque = await consultaEstoqueC(
+              supabase, romaneio.frutaId, element.calibre, 'Cat2');
+
+          if (itemEstoque != null) {
+            // Se o item existir no estoque, atualiza a quantidade
+            int quantidadeAntiga = itemEstoque['Quantidade'];
+            int novaQuantidade = quantidadeAntiga + element.cat2;
+            await atualizaEstoqueC(
+                supabase,
+                romaneio.frutaId,
+                double.parse(novaQuantidade.toString()),
+                element.calibre,
+                'Cat2');
+          } else {
+            // Se o item não existir no estoque, cria um novo registro
+
+            await insereEstoqueC(
+                supabase,
+                EstoqueC(
+                  id: 1,
+                  frutaId: romaneio.frutaId,
+                  quantidade: element.cat2,
+                  calibre: element.calibre,
+                  categoria: 'Cat2',
+                ));
+          }
+        }
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -343,6 +465,35 @@ Future<void> cadastrarRomaneioPA(SupabaseClient supabase, Romaneio romaneio,
           cat2: romaneioPa.cat2);
 
       await supabase.from('RomaneioPA').insert(romaneiCad.toMap());
+
+      List<CalibreCp> calibreCp = parseCalibrePaPRomaneio(romaneiCad);
+
+      for (var element in calibreCp) {
+        if (element.quant > 0 && element.calibre != 'Total') {
+          Map<String, dynamic>? itemEstoque = await consultaEstoqueC(
+              supabase, romaneio.frutaId, element.calibre, "1");
+
+          if (itemEstoque != null) {
+            // Se o item existir no estoque, atualiza a quantidade
+            int quantidadeAntiga = itemEstoque['Quantidade'];
+            int novaQuantidade = quantidadeAntiga + element.quant;
+            await atualizaEstoqueC(supabase, romaneio.frutaId,
+                double.parse(novaQuantidade.toString()), element.calibre, '1');
+          } else {
+            // Se o item não existir no estoque, cria um novo registro
+
+            await insereEstoqueC(
+                supabase,
+                EstoqueC(
+                  id: 1,
+                  frutaId: romaneio.frutaId,
+                  quantidade: element.quant,
+                  calibre: element.calibre,
+                  categoria: '1',
+                ));
+          }
+        }
+      }
     } catch (e) {
       //print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
@@ -386,6 +537,35 @@ Future<void> cadastrarRomaneioCP(SupabaseClient supabase, Romaneio romaneio,
           cat2: romaneioCp.cat2);
 
       await supabase.from('RomaneioCP').insert(romaneiCad.toMap());
+
+      List<CalibreCp> calibreCp = parseCalibreCpPRomaneio(romaneiCad);
+
+      for (var element in calibreCp) {
+        if (element.quant > 0 && element.calibre != 'Total') {
+          Map<String, dynamic>? itemEstoque = await consultaEstoqueC(
+              supabase, romaneio.frutaId, element.calibre, "1");
+
+          if (itemEstoque != null) {
+            // Se o item existir no estoque, atualiza a quantidade
+            int quantidadeAntiga = itemEstoque['Quantidade'];
+            int novaQuantidade = quantidadeAntiga + element.quant;
+            await atualizaEstoqueC(supabase, romaneio.frutaId,
+                double.parse(novaQuantidade.toString()), element.calibre, '1');
+          } else {
+            // Se o item não existir no estoque, cria um novo registro
+
+            await insereEstoqueC(
+                supabase,
+                EstoqueC(
+                  id: 1,
+                  frutaId: romaneio.frutaId,
+                  quantidade: element.quant,
+                  calibre: element.calibre,
+                  categoria: '1',
+                ));
+          }
+        }
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -468,75 +648,6 @@ List<Produtor> parseProdutor(List<dynamic> responseBody) {
   return produtorList;
 }
 
-//Cadastro novos paletes
-Future<void> cadastroPaleteM(
-    SupabaseClient supabase, PaleteM palete, BuildContext context) async {
-  try {
-    await supabase.from('PaleteM').insert(palete.toMap());
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          e.toString(),
-          style: const TextStyle(color: textColor),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
-  }
-}
-
-Future<void> cadastroPaleteCP(
-    SupabaseClient supabase, PaleteCP palete, BuildContext context) async {
-  try {
-    await supabase.from('PaleteCP').insert(palete.toMap());
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          e.toString(),
-          style: const TextStyle(color: textColor),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
-  }
-}
-
-Future<void> cadastroPaletePA(
-    SupabaseClient supabase, PaletePA palete, BuildContext context) async {
-  try {
-    await supabase.from('PaletePA').insert(palete.toMap());
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          e.toString(),
-          style: const TextStyle(color: textColor),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
-  }
-}
-
-Future<void> cadastroPaleteO(
-    SupabaseClient supabase, PaleteO palete, BuildContext context) async {
-  try {
-    await supabase.from('PaleteO').insert(palete.toMap());
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          e.toString(),
-          style: const TextStyle(color: textColor),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
-  }
-}
-
 //Buscando paletes
 Future<List<Palete>> buscarPaletesNCarregados(
     SupabaseClient client, bool carregado) async {
@@ -564,13 +675,145 @@ Future<List<Palete>> buscarPaleteId(SupabaseClient client, int id) async {
 
 Future<List<Palete>> buscarPaletesPelaCarga(
     SupabaseClient client, int carga) async {
-  final paleteJson = await client.from('Palete').select().eq('Carga', carga);
+  final paleteJson = await client.from('Palete').select().eq('CargaId', carga);
   return parsePaleteJson(paleteJson);
 }
 
 List<Palete> parsePaleteJson(List<dynamic> responseBody) {
   List<Palete> palete = responseBody.map((e) => Palete.fromJson(e)).toList();
   return palete;
+}
+
+Future<List<PaleteFrutaLista>> buscarPaleteFruta(
+    SupabaseClient client, int paleteId) async {
+  final paleteJson = await client
+      .from('Palete_Fruta')
+      .select(
+          'id, Fruta(id, Nome, Variedade), PaleteId, Quantidade, Calibre, Categoria')
+      .eq('PaleteId', paleteId);
+  return parsePaleteFrutaJson(paleteJson);
+}
+
+List<PaleteFrutaLista> parsePaleteFrutaJson(List<dynamic> responseBody) {
+  List<PaleteFrutaLista> paleteF =
+      responseBody.map((e) => PaleteFrutaLista.fromJson(e)).toList();
+  return paleteF;
+}
+
+Future<List<PaleteFrutaLista>> buscaPaleteFrutaPCarga(
+    SupabaseClient client, int carga) async {
+  List<Palete> paletes = await buscarPaletesPelaCarga(client, carga);
+  List<PaleteFrutaLista> listaDefinit = [];
+  List<PaleteFrutaLista> listaAux = [];
+
+  for (var element in paletes) {
+    final paleteJson = await client
+        .from('Palete_Fruta')
+        .select(
+            'id, Fruta(id, Nome, Variedade), PaleteId, Quantidade, Calibre, Categoria')
+        .eq('PaleteId', element.id);
+    listaAux = parsePaleteFrutaJson(paleteJson);
+    for (var ele in listaAux) {
+      int auxNum = 0;
+      for (var i = 0; i < listaDefinit.length; i++) {
+        if (ele.calibre == listaDefinit[i].calibre &&
+            ele.categoria == listaDefinit[i].categoria &&
+            ele.fruta.nome == listaDefinit[i].fruta.nome &&
+            ele.fruta.variedade == listaDefinit[i].fruta.variedade) {
+          listaDefinit[i].quantidade += ele.quantidade;
+          auxNum = 1;
+        }
+      }
+      if (auxNum == 0) {
+        listaDefinit.add(ele);
+      }
+    }
+  }
+
+  listaDefinit.sort((a, b) {
+    var adate = a.calibre;
+    var bdate = b.calibre;
+    return adate.compareTo(bdate);
+  });
+
+  return listaDefinit;
+}
+
+Future<Map<String, double>> buscarPaletesPChart(SupabaseClient client, {bool carregado = false}) async {
+  var mapObj = <String, double>{};
+
+  List<Palete> paletes = await buscarPaletesNCarregados(client, carregado);
+
+  for (var ele in paletes) {
+    List<PaleteFrutaLista> aux = await buscarPaleteFruta(client, ele.id);
+    List<PaleteFrutaLista> paleteFruta = [];
+    for (var e in aux) {
+      if (paleteFruta.isEmpty) {
+        paleteFruta.add(e);
+      } else if (paleteFruta[0].quantidade < e.quantidade) {
+        paleteFruta.clear();
+        paleteFruta.add(e);
+      }
+    }
+    if (mapObj[paleteFruta[0].fruta.nome] == null) {
+      mapObj[paleteFruta[0].fruta.nome] = 1;
+    } else {
+      mapObj[paleteFruta[0].fruta.nome] =
+          1 + mapObj[paleteFruta[0].fruta.nome]!;
+    }
+  }
+
+  return mapObj;
+}
+
+Future<void> createPalete(SupabaseClient client, List<EstoqueC> estoquec,
+    Palete palete, BuildContext context) async {
+  try {
+    final response =
+        await client.from('Palete').insert(palete.toMap()).select('id');
+
+    for (var ele in estoquec) {
+      await cadPaleteFruta(
+          client,
+          PaleteFruta(
+              id: 1,
+              frutaId: ele.frutaId,
+              paleteId: response[0]['id'],
+              quantidade: ele.quantidade,
+              calibre: ele.calibre,
+              categoria: ele.categoria),
+          context);
+
+      await deletaEstoqueC(client, ele);
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+}
+
+Future<void> cadPaleteFruta(SupabaseClient client, PaleteFruta paleteFruta,
+    BuildContext context) async {
+  try {
+    await client.from('Palete_Fruta').insert(paleteFruta.toMap());
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+          style: const TextStyle(color: textColor),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
 }
 
 //Buscando cargas
@@ -584,164 +827,9 @@ List<Carga> parseCargaJson(List<dynamic> responseBody) {
   return carga;
 }
 
-//recebendo dados para palete m
-Future<List<PaleteMLista>> buscarPaleteM(SupabaseClient client, int id) async {
-  final paleteMJson = await client
-      .from('PaleteM')
-      .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
-      .eq('PaleteId', id);
-
-  return parsePaleteMJson(paleteMJson);
-}
-
-List<PaleteMLista> parsePaleteMJson(List<dynamic> responseBody) {
-  List<PaleteMLista> paleteM =
-      responseBody.map((e) => PaleteMLista.fromJson(e)).toList();
-  return paleteM;
-}
-
-List<CalibreM> parseCalibreM(PaleteMLista r) {
-  List<CalibreM> calibrem = [
-    CalibreM(calibre: '220', cat1: r.c2201, cat2: 0),
-    CalibreM(calibre: '198', cat1: r.c1981, cat2: 0),
-    CalibreM(calibre: '180', cat1: r.c1801, cat2: r.c1802),
-    CalibreM(calibre: '165', cat1: r.c1651, cat2: r.c1652),
-    CalibreM(calibre: '150', cat1: r.c1501, cat2: r.c1502),
-    CalibreM(calibre: '135', cat1: r.c1351, cat2: r.c1352),
-    CalibreM(calibre: '120', cat1: r.c1201, cat2: r.c1202),
-    CalibreM(calibre: '110', cat1: r.c1101, cat2: r.c1102),
-    CalibreM(calibre: '100', cat1: r.c1001, cat2: r.c1002),
-    CalibreM(calibre: '90', cat1: r.c901, cat2: r.c902),
-    CalibreM(calibre: '80', cat1: r.c801, cat2: r.c802),
-    CalibreM(calibre: '70', cat1: r.c701, cat2: r.c702),
-    CalibreM(calibre: 'Comercial', cat1: 0, cat2: r.comercial),
-    CalibreM(
-        calibre: 'Total',
-        cat1: r.c2201 +
-            r.c1981 +
-            r.c1801 +
-            r.c1651 +
-            r.c1501 +
-            r.c1351 +
-            r.c1201 +
-            r.c1101 +
-            r.c1001 +
-            r.c901 +
-            r.c801 +
-            r.c701,
-        cat2: r.c1802 +
-            r.c1652 +
-            r.c1502 +
-            r.c1352 +
-            r.c1202 +
-            r.c1102 +
-            r.c1002 +
-            r.c902 +
-            r.c802 +
-            r.c702 +
-            r.comercial),
-  ];
-  return calibrem;
-}
-
-//recebendo dados para palete CP
-
-Future<List<PaleteCpLista>> buscarPaleteCP(
-    SupabaseClient client, int id) async {
-  final paleteCPJson = await client
-      .from('PaleteCP')
-      .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
-      .eq('PaleteId', id);
-
-  return parsePaleteCPJson(paleteCPJson);
-}
-
-List<PaleteCpLista> parsePaleteCPJson(List<dynamic> responseBody) {
-  List<PaleteCpLista> paleteCP =
-      responseBody.map((e) => PaleteCpLista.fromJson(e)).toList();
-  return paleteCP;
-}
-
-List<CalibreCp> parseCalibreCp(PaleteCpLista rcp) {
-  List<CalibreCp> calibrecp = [
-    CalibreCp(calibre: 'GG', quant: rcp.gg),
-    CalibreCp(calibre: 'G', quant: rcp.g),
-    CalibreCp(calibre: 'M', quant: rcp.m),
-    CalibreCp(calibre: 'P', quant: rcp.p),
-    CalibreCp(calibre: 'PP', quant: rcp.pp),
-    CalibreCp(calibre: 'Cat 2', quant: rcp.cat2),
-    CalibreCp(
-        calibre: 'Total',
-        quant: rcp.gg + rcp.g + rcp.m + rcp.p + rcp.pp + rcp.cat2),
-  ];
-  return calibrecp;
-}
-
-//recebendo dados para palete PA
-Future<List<PaletePALista>> buscarPaletePA(
-    SupabaseClient client, int id) async {
-  final paletePAJson = await client
-      .from('PaletePA')
-      .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
-      .eq('PaleteId', id);
-
-  return parsePaletePAJson(paletePAJson);
-}
-
-List<PaletePALista> parsePaletePAJson(List<dynamic> responseBody) {
-  List<PaletePALista> paletePA =
-      responseBody.map((e) => PaletePALista.fromJson(e)).toList();
-  return paletePA;
-}
-
-List<CalibreCp> parseCalibrePa(PaletePALista rpa) {
-  List<CalibreCp> calibrecp = [
-    CalibreCp(calibre: 'Granel', quant: rpa.c45),
-    CalibreCp(calibre: '40', quant: rpa.c40),
-    CalibreCp(calibre: '36', quant: rpa.c36),
-    CalibreCp(calibre: '32', quant: rpa.c32),
-    CalibreCp(calibre: '30', quant: rpa.c30),
-    CalibreCp(calibre: '28', quant: rpa.c28),
-    CalibreCp(calibre: '24', quant: rpa.c24),
-    CalibreCp(calibre: '22', quant: rpa.c22),
-    CalibreCp(calibre: '20', quant: rpa.c20),
-    CalibreCp(calibre: '18', quant: rpa.c18),
-    CalibreCp(calibre: '14', quant: rpa.c14),
-    CalibreCp(calibre: '12', quant: rpa.c12),
-    CalibreCp(calibre: 'Cat 2', quant: rpa.cat2),
-    CalibreCp(
-        calibre: 'Total',
-        quant: rpa.c45 +
-            rpa.c40 +
-            rpa.c36 +
-            rpa.c32 +
-            rpa.c30 +
-            rpa.c28 +
-            rpa.c24 +
-            rpa.c22 +
-            rpa.c20 +
-            rpa.c18 +
-            rpa.c14 +
-            rpa.c12 +
-            rpa.cat2),
-  ];
-  return calibrecp;
-}
-
-//recebendo dados para palete O
-Future<List<PaleteO>> buscarPaleteO(SupabaseClient client, int id) async {
-  final paleteOJson = await client.from('PaleteO').select().eq('PaleteId', id);
-
-  return parsePaleteOJson(paleteOJson);
-}
-
-List<PaleteO> parsePaleteOJson(List<dynamic> responseBody) {
-  List<PaleteO> paleteO = responseBody.map((e) => PaleteO.fromJson(e)).toList();
-  return paleteO;
-}
-
 //Consulta de estoque
-Future<List<EstoqueLista>> buscarEstoque(SupabaseClient client, String tabela) async {
+Future<List<EstoqueLista>> buscarEstoque(
+    SupabaseClient client, String tabela) async {
   final estoqueJson = await client
       .from(tabela)
       .select(
@@ -754,6 +842,22 @@ Future<List<EstoqueLista>> buscarEstoque(SupabaseClient client, String tabela) a
 List<EstoqueLista> parseEstoque(List<dynamic> responseBody) {
   List<EstoqueLista> estoque =
       responseBody.map((e) => EstoqueLista.fromJson(e)).toList();
+  return estoque;
+}
+
+Future<List<EstoqueListaC>> buscarEstoqueC(SupabaseClient client) async {
+  final estoqueJson = await client
+      .from('EstoqueC')
+      .select(
+          'id, Fruta:FrutaId(id, Nome, Variedade), Quantidade, Calibre, Categoria')
+      .order('Quantidade');
+
+  return parseEstoqueC(estoqueJson);
+}
+
+List<EstoqueListaC> parseEstoqueC(List<dynamic> responseBody) {
+  List<EstoqueListaC> estoque =
+      responseBody.map((e) => EstoqueListaC.fromJson(e)).toList();
   return estoque;
 }
 

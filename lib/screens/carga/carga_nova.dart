@@ -7,7 +7,6 @@ import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/palete.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/screens/carga/confirmacao_carga.dart';
-import 'package:maca_ipe/screens/paletes/palete_tabela.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CargaNova extends StatefulWidget {
@@ -101,15 +100,7 @@ class _CargaNovaState extends State<CargaNova> {
                                 columnData(e.carga.toString(), e.id.toString()),
                                 columnData(e.carregado ? "Sim" : "Não",
                                     e.id.toString()),
-                                columnIconBtn(() {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => PaleteTabela(
-                                              palete: e,
-                                            )),
-                                  );
-                                }, 'assets/icons/list.svg'),
+                                columnIconBtn(() {}, 'assets/icons/list.svg'),
                               ]);
                             }).toList(),
                           );

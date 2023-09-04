@@ -3,17 +3,10 @@ import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/componetes_gerais/left_menu.dart';
 import 'package:maca_ipe/componetes_gerais/title_medium.dart';
 import 'package:maca_ipe/datas/estoque_lista.dart';
-import 'package:maca_ipe/datas/palete.dart';
-import 'package:maca_ipe/datas/palete_cp_lista.dart';
-import 'package:maca_ipe/datas/palete_m_lista.dart';
-import 'package:maca_ipe/datas/palete_o.dart';
-import 'package:maca_ipe/datas/palete_pa_lista.dart';
-import 'package:maca_ipe/datas/romaneio_cp.dart';
-import 'package:maca_ipe/datas/romaneio_m.dart';
-import 'package:maca_ipe/datas/statics.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/estoque/estoque_statics.dart';
+import 'package:maca_ipe/screens/estoque/estoque_statics_SC.dart';
 import 'package:maca_ipe/screens/paletes/paletes_statics.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -81,9 +74,8 @@ class HomePage extends StatelessWidget {
                                         Radius.circular(10),
                                       ),
                                     ),
-                                    child: FutureBuilder<List<Palete>>(
-                                        future: buscarPaletesNCarregados(
-                                            client, false),
+                                    child: FutureBuilder<Map<String, double>>(
+                                        future: buscarPaletesPChart(client),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
@@ -92,30 +84,10 @@ class HomePage extends StatelessWidget {
                                                   CircularProgressIndicator(),
                                             );
                                           } else if (snapshot.hasData) {
-                                            return FutureBuilder<
-                                                    StaticsPaletes>(
-                                                future: returnStatics(
-                                                    snapshot.data!),
-                                                builder: (context, snapshot2) {
-                                                  if (snapshot2
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
-                                                    );
-                                                  } else if (snapshot2
-                                                      .hasData) {
-                                                    return PaletesStatics(
-                                                        statics:
-                                                            snapshot2.data!);
-                                                  } else {
-                                                    return const Center(
-                                                      child: Text(
-                                                          'Erro ao trazer estatiticas'),
-                                                    );
-                                                  }
-                                                });
+                                            return snapshot.data!.isNotEmpty
+                                                ? PaletesStatics(
+                                                    paletes: snapshot.data!)
+                                                : const Center();
                                           } else {
                                             return const Center(
                                               child: Text(
@@ -139,9 +111,8 @@ class HomePage extends StatelessWidget {
                                         Radius.circular(10),
                                       ),
                                     ),
-                                    child: FutureBuilder<List<EstoqueLista>>(
-                                        future:
-                                            buscarEstoque(client, 'EstoqueC'),
+                                    child: FutureBuilder<List<EstoqueListaC>>(
+                                        future: buscarEstoqueC(client),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
@@ -150,7 +121,7 @@ class HomePage extends StatelessWidget {
                                                   CircularProgressIndicator(),
                                             );
                                           } else if (snapshot.hasData) {
-                                            List<EstoqueLista> estoque =
+                                            List<EstoqueListaC> estoque =
                                                 snapshot.data!;
 
                                             return Column(
@@ -213,7 +184,7 @@ class HomePage extends StatelessWidget {
                                                 const SizedBox(
                                                   height: defaultPadding,
                                                 ),
-                                                EstoqueStatics(
+                                                EstoqueStaticsSC(
                                                   estoque: estoque,
                                                 ),
                                               ],
@@ -241,90 +212,5 @@ class HomePage extends StatelessWidget {
         ]),
       ),
     );
-  }
-
-  //Retorna estatisticas.
-  Future<StaticsPaletes> returnStatics(List<Palete> paletes) async {
-    StaticsPaletes statics = StaticsPaletes();
-    PaleteMLista? paleteM;
-    PaleteCpLista? paleteCp;
-    PaleteO? paleteO;
-    PaletePALista? paletePa;
-    for (var e in paletes) {
-      final responses = await Future.wait([
-        client
-            .from('PaleteM')
-            .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
-            .eq('PaleteId', e.id),
-        client
-            .from('PaleteCP')
-            .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
-            .eq('PaleteId', e.id),
-        client.from('PaleteO').select().eq('PaleteId', e.id),
-        client
-            .from('PaletePA')
-            .select('*, Fruta(id, Nome, Variedade), Embalagem(id, Nome)')
-            .eq('PaleteId', e.id),
-      ]);
-      if (responses[0].isNotEmpty) {
-        paleteM = PaleteMLista.fromJson(responses[0][0]);
-      }
-
-      if (responses[1].isNotEmpty) {
-        paleteCp = PaleteCpLista.fromJson(responses[1][0]);
-      }
-
-      if (responses[2].isNotEmpty) {
-        paleteO = PaleteO.fromJson(responses[2][0]);
-      }
-
-      if (responses[3].isNotEmpty) {
-        paletePa = PaletePALista.fromJson(responses[3][0]);
-      }
-
-      if (paleteM != null) {
-        List<CalibreM> calibreM = parseCalibreM(paleteM);
-        calibreM.where((ele) => ele.cat1 > 0 || ele.cat2 > 0).map((c) {
-          if (c.calibre == "Total") {
-            statics.maca += (c.cat1 + c.cat2) / 49;
-          }
-        }).toList();
-      }
-
-      if (paleteCp != null) {
-        List<CalibreCp> calibreCP = parseCalibreCp(paleteCp);
-        calibreCP.where((ele) => ele.quant > 0).map((c) {
-          if (c.calibre == "Total") {
-            if (paleteCp!.fruta.nome == 'Caqui') {
-              statics.caqui += c.quant / 60;
-            } else {
-              statics.pera += c.quant / 60;
-            }
-          }
-        }).toList();
-      }
-
-      if (paleteO != null) {
-        List<PaleteO> paletesO = await buscarPaleteO(client, e.id);
-        paletesO.where((ele) => ele.quant > 0).map((c) {
-          statics.outro += 1;
-        }).toList();
-      }
-
-      if (paletePa != null) {
-        List<CalibreCp> calibrePa = parseCalibrePa(paletePa);
-        calibrePa.where((ele) => ele.quant > 0).map((c) {
-          if (c.calibre == "Total") {
-            if (paletePa!.fruta.nome == 'Ameixa') {
-              statics.ameixa += c.quant / 104;
-            } else {
-              statics.pessego += c.quant / 104;
-            }
-          }
-        }).toList();
-      }
-    }
-
-    return statics;
   }
 }

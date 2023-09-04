@@ -24,6 +24,12 @@ DataCell columnData(String data, {String message = ''}) {
       child: Text(data, style: const TextStyle(fontSize: 16))));
 }
 
+DataCell columnDataField(String data, VoidCallbackAction function, {String message = ''}) {
+  return DataCell(Tooltip(
+      message: message,
+      child: TextField(onChanged: (value) => function, style: const TextStyle(fontSize: 16))));
+}
+
 DataColumn columnTable(String title) {
   return DataColumn(
     label: Text(

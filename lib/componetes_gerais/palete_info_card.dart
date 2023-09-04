@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
-import 'package:maca_ipe/datas/palete_info.dart';
+import 'package:maca_ipe/datas/palete.dart';
+import 'package:maca_ipe/datas/palete_fruta.dart';
 
 class PaleteInfoCard extends StatelessWidget {
   const PaleteInfoCard({
     Key? key,
     required this.palete,
+    required this.paleteFruta,
   }) : super(key: key);
 
-  final PaleteInfo palete;
+  final Palete palete;
+  final List<PaleteFrutaLista> paleteFruta;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,6 @@ class PaleteInfoCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -44,34 +46,44 @@ class PaleteInfoCard extends StatelessWidget {
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                child: Text(palete.palete),
+                child: Text(palete.id.toString()),
               ),
             ],
           ),
-          Text(
-            palete.fruta,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                palete.calibre,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.white70),
-              ),
-              Text(
-                palete.quant.toString(),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.white),
-              ),
-            ],
-          )
+          ...paleteFruta
+              .map(
+                (e) => Column(
+                  children: [
+                    
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                      "${e.fruta.nome} ${e.fruta.variedade}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                        Text(
+                          e.calibre,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: Colors.white70),
+                        ),
+                        Text(
+                          e.quantidade.toString(),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+              .toList(),
         ],
       ),
     );

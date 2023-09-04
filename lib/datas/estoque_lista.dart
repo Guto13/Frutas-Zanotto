@@ -24,6 +24,32 @@ class EstoqueLista {
   }
 }
 
+class EstoqueListaC {
+  final int id;
+  final FrutaEstoque fruta;
+  double quantidade;
+  final String calibre;
+  final String categoria;
+
+  EstoqueListaC({
+    required this.id,
+    required this.fruta,
+    required this.quantidade,
+    required this.calibre,
+    required this.categoria,
+  });
+
+  factory EstoqueListaC.fromJson(Map<String, dynamic> json) {
+    return EstoqueListaC(
+      quantidade: json['Quantidade'],
+      id: json['id'],
+      fruta: FrutaEstoque.fromJson(json['Fruta']),
+      calibre: json['Calibre'],
+      categoria: json['Categoria'],
+    );
+  }
+}
+
 class FrutaEstoque {
   int id;
   String nome;
@@ -31,7 +57,8 @@ class FrutaEstoque {
 
   FrutaEstoque({
     required this.nome,
-    required this.variedade, required this.id,
+    required this.variedade,
+    required this.id,
   });
 
   factory FrutaEstoque.fromJson(Map<String, dynamic> json) {
@@ -48,7 +75,8 @@ class EmbalagemEstoque {
   String nome;
 
   EmbalagemEstoque({
-    required this.nome,required this.id,
+    required this.nome,
+    required this.id,
   });
 
   factory EmbalagemEstoque.fromJson(Map<String, dynamic> json) {
@@ -66,7 +94,8 @@ class ProdutorEstoque {
 
   ProdutorEstoque({
     required this.nome,
-    required this.sobrenome, required this.id,
+    required this.sobrenome,
+    required this.id,
   });
 
   factory ProdutorEstoque.fromJson(Map<String, dynamic> json) {

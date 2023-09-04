@@ -25,18 +25,3 @@ class StaticsPaletes {
     };
   }
 }
-
-class StaticsEstoque {
-  String fruta;
-  String produtor;
-  double quantFruta;
-  double quantProdut;
-
-  StaticsEstoque({
-    this.fruta = "",
-    this.produtor = "",
-    this.quantFruta = 0.0,
-    this.quantProdut = 0.0,
-  });
-
-}
