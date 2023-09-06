@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/app_bar.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_cp/romaneio_cp_desktop.dart';
+import 'package:maca_ipe/screens/romaneio/romaneio_cp/romaneio_cp_mobile.dart';
 
 class RomaneioCPScreen extends StatefulWidget {
   const RomaneioCPScreen({Key? key, required this.frutaR}) : super(key: key);
@@ -19,8 +21,8 @@ class _RomaneioCPScreenState extends State<RomaneioCPScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Romaneio - ${widget.frutaR}'),
-      body: RomaneioCPDesktop(
-              textControllers: textControllers, frutaR: widget.frutaR),
+      body: !Responsive.isMobile(context) ? RomaneioCPDesktop(
+              textControllers: textControllers, frutaR: widget.frutaR) : RomaneioCPMobile(textControllers: textControllers, frutaR: widget.frutaR),
        
     );
   }

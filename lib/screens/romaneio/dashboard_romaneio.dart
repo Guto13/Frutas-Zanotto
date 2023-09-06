@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/button_text_default.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_cp/romaneio_cp_screen.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_m/romaneio_m_screen.dart';
 import 'package:maca_ipe/screens/romaneio/romaneio_pa/romaneio_pa_screen.dart';
@@ -41,9 +42,11 @@ class _DashboardRomaneioState extends State<DashboardRomaneio> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         childAspectRatio: 2.5,
-        crossAxisCount: 3,
-        crossAxisSpacing: defaultPadding*2,
-        mainAxisSpacing: defaultPadding*2,
+        crossAxisCount: Responsive.isMobile(context) ? 1 : 3,
+        crossAxisSpacing:
+            Responsive.isMobile(context) ? defaultPadding : defaultPadding * 2,
+        mainAxisSpacing:
+            Responsive.isMobile(context) ? defaultPadding : defaultPadding * 2,
         children: [
           ...buttons
               .map((e) => ButtonTextDefault(
