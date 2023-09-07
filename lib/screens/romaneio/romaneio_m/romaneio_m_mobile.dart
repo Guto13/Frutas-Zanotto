@@ -83,50 +83,50 @@ class _RomaneioMMobileState extends State<RomaneioMMobile> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         FutureDropFruta(
-                            client: client,
-                            onFrutaSelected: handleFrutaSelected,
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          CampoRetorno(
-                            controller: TextEditingController(
-                                text: _frutaSelecionada?.nomeVariedade),
-                            label: 'Fruta',
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          FutureDropEmbalagem(
-                            client: client,
-                            onEmbalagemSelected: handleEmbalSelected,
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          CampoRetorno(
-                            controller: TextEditingController(
-                                text: _embalagemSelecionada?.nomePeso),
-                            label: 'Embalagem',
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          FutureDropProdutor(
-                            client: client,
-                            onProdutorSelect: handleProdutorSelected,
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          CampoRetorno(
-                            controller: TextEditingController(
-                                text: _produtorSelecionado?.nomeCompleto),
-                            label: 'Produtor',
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
+                          client: client,
+                          onFrutaSelected: handleFrutaSelected,
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        CampoRetorno(
+                          controller: TextEditingController(
+                              text: _frutaSelecionada?.nomeVariedade),
+                          label: 'Fruta',
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        FutureDropEmbalagem(
+                          client: client,
+                          onEmbalagemSelected: handleEmbalSelected,
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        CampoRetorno(
+                          controller: TextEditingController(
+                              text: _embalagemSelecionada?.nomePeso),
+                          label: 'Embalagem',
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        FutureDropProdutor(
+                          client: client,
+                          onProdutorSelect: handleProdutorSelected,
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        CampoRetorno(
+                          controller: TextEditingController(
+                              text: _produtorSelecionado?.nomeCompleto),
+                          label: 'Produtor',
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -173,7 +173,9 @@ class _RomaneioMMobileState extends State<RomaneioMMobile> {
                                 name: '70'),
                           ],
                         ),
-                        const SizedBox(height: defaultPadding,),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
                         const Text(
                           'Cat2',
                           style: TextStyle(fontSize: fontTitle),
@@ -201,14 +203,11 @@ class _RomaneioMMobileState extends State<RomaneioMMobile> {
                             controller: widget.textControllers[18],
                             name: '100'),
                         CardRomaneio(
-                            controller: widget.textControllers[19],
-                            name: '90'),
+                            controller: widget.textControllers[19], name: '90'),
                         CardRomaneio(
-                            controller: widget.textControllers[20],
-                            name: '80'),
+                            controller: widget.textControllers[20], name: '80'),
                         CardRomaneio(
-                            controller: widget.textControllers[21],
-                            name: '70'),
+                            controller: widget.textControllers[21], name: '70'),
                         CardRomaneio(
                             controller: widget.textControllers[22],
                             name: 'Com'),

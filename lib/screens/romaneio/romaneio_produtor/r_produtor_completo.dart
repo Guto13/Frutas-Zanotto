@@ -6,6 +6,7 @@ import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/romaneio_cp.dart';
 import 'package:maca_ipe/datas/romaneio_lista.dart';
 import 'package:maca_ipe/datas/romaneio_m.dart';
+import 'package:maca_ipe/datas/romaneio_o.dart';
 import 'package:maca_ipe/datas/romaneio_pa.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -91,6 +92,18 @@ class _RProdutorCompletoState extends State<RProdutorCompleto> {
     }
 
     return calibres;
+  }
+
+  Future<List<RomaneioO>> buscarRomaneiosO(
+      List<RomaneioLista> romaneios) async {
+    List<RomaneioO> romaneiosO = [];
+    for (var romaneio in romaneios) {
+      List<RomaneioO> aux = [];
+      aux = await buscarRomaneioO(client, romaneio.id);
+      romaneiosO.add(aux[0]);
+    }
+
+    return romaneiosO;
   }
 
   @override
@@ -290,6 +303,86 @@ class _RProdutorCompletoState extends State<RProdutorCompleto> {
                                                 ]),
                                               )
                                               .toList(),
+                                      ],
+                                    ),
+                                  ],
+                                ));
+                          }).toList(),
+                        ),
+                      );
+                    } else {
+                      return const Center(
+                        child: Text('Erro ao carregar dados'),
+                      );
+                    }
+                  },
+                );
+              } else if (widget.tFruta == 'RomaneioO') {
+                return FutureBuilder<List<RomaneioO>>(
+                  future: buscarRomaneiosO(romaneioListaok),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasData) {
+                      List<RomaneioO> romaneioO = snapshot.data!;
+                      int isHeaderAdded = 0;
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Row(
+                          children: romaneioO.map((ele) {
+                            isHeaderAdded++;
+                            return SizedBox(
+                                width: isHeaderAdded == 1
+                                    ? romaneioArea
+                                    : romaneioArea / 2,
+                                child: Column(
+                                  children: [
+                                    if (isHeaderAdded != romaneioO.length)
+                                      Text(formatDate(
+                                          romaneioListaok[isHeaderAdded - 1]
+                                              .data,
+                                          [dd, '-', mm, '-', yyyy])),
+                                    if (isHeaderAdded == romaneioO.length)
+                                      const Text('Totais'),
+                                    const SizedBox(
+                                      height: defaultPadding,
+                                    ),
+                                    Table(
+                                      defaultColumnWidth:
+                                          const FlexColumnWidth(1.0),
+                                      border: TableBorder.all(
+                                          color: Colors.black, width: 1),
+                                      children: [
+                                        if (isHeaderAdded == 1)
+                                          const TableRow(
+                                            children: [
+                                              CampoTabelaCabecalho(
+                                                  value: 'Calibre'),
+                                              CampoTabelaCabecalho(
+                                                  value: 'Quant'),
+                                            ],
+                                          ),
+                                        if (isHeaderAdded != 1)
+                                          const TableRow(
+                                            children: [
+                                              CampoTabelaCabecalho(
+                                                  value: 'Quant'),
+                                            ],
+                                          ),
+                                        if (isHeaderAdded == 1)
+                                          TableRow(children: [
+                                            CampoTabelaCabecalho(
+                                                value: ele.nome),
+                                            CampoTabela(
+                                                value: ele.quant.toString()),
+                                          ]),
+                                        if (isHeaderAdded != 1)
+                                          TableRow(children: [
+                                            CampoTabela(
+                                                value: ele.quant.toString()),
+                                          ]),
                                       ],
                                     ),
                                   ],

@@ -1182,3 +1182,18 @@ List<List<CalibreCp>> addTotaisCalibrePA(List<List<CalibreCp>> calibresGerais) {
 
   return calibresGerais;
 }
+
+//recebendo dados para romaneio O
+
+Future<List<RomaneioO>> buscarRomaneioO(SupabaseClient client, int id) async {
+  final romaneioOJson =
+      await client.from('RomaneioO').select().eq('RomaneioId', id);
+
+  return parseRomaneioOJson(romaneioOJson);
+}
+
+List<RomaneioO> parseRomaneioOJson(List<dynamic> responseBody) {
+  List<RomaneioO> romaneioO =
+      responseBody.map((e) => RomaneioO.fromJson(e)).toList();
+  return romaneioO;
+}

@@ -198,7 +198,7 @@ class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
                                   const SizedBox(
                                     height: defaultPadding,
                                   ),
-                                  if (!Responsive.isDesktop(context))
+                                  if (Responsive.isTablet(context))
                                     Row(
                                       children: [
                                         Expanded(
@@ -223,11 +223,11 @@ class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
                                         ),
                                       ],
                                     ),
-                                  if (!Responsive.isDesktop(context))
+                                  if (Responsive.isTablet(context))
                                     const SizedBox(
                                       height: defaultPadding,
                                     ),
-                                  if (!Responsive.isDesktop(context))
+                                  if (Responsive.isTablet(context))
                                     Row(
                                       children: [
                                         Expanded(
@@ -252,11 +252,11 @@ class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
                                         ),
                                       ],
                                     ),
-                                  if (!Responsive.isDesktop(context))
+                                  if (Responsive.isTablet(context))
                                     const SizedBox(
                                       height: defaultPadding,
                                     ),
-                                  if (!Responsive.isDesktop(context))
+                                  if (Responsive.isTablet(context))
                                     Row(
                                       children: [
                                         Expanded(
@@ -281,9 +281,61 @@ class _EntradaEstoqueCState extends State<EntradaEstoqueC> {
                                         ),
                                       ],
                                     ),
-                                  if (!Responsive.isDesktop(context))
+                                  if (Responsive.isTablet(context))
                                     const SizedBox(
                                       height: defaultPadding,
+                                    ),
+                                    if (Responsive.isMobile(context))
+                                    Column(
+                                      children: [
+                                        FutureDropFruta(
+                                          client: client,
+                                          onFrutaSelected: handleFrutaSelected,
+                                        ),
+                                        const SizedBox(
+                                          height: defaultPadding,
+                                        ),
+                                        CampoRetorno(
+                                          controller: TextEditingController(
+                                              text: _frutaSelecionada
+                                                  ?.nomeVariedade),
+                                          label: 'Fruta',
+                                        ),
+                                        const SizedBox(
+                                          height: defaultPadding,
+                                        ),
+                                        FutureDropEmbalagem(
+                                          client: client,
+                                          onEmbalagemSelected:
+                                              handleEmbalSelected,
+                                        ),
+                                        const SizedBox(
+                                          height: defaultPadding,
+                                        ),
+                                        CampoRetorno(
+                                          controller: TextEditingController(
+                                              text: _embalagemSelecionada
+                                                  ?.nomePeso),
+                                          label: 'Embalagem',
+                                        ),
+                                        const SizedBox(
+                                          height: defaultPadding,
+                                        ),
+                                        FutureDropProdutor(
+                                          client: client,
+                                          onProdutorSelect:
+                                              handleProdutorSelected,
+                                        ),
+                                        const SizedBox(
+                                          height: defaultPadding,
+                                        ),
+                                        CampoRetorno(
+                                          controller: TextEditingController(
+                                              text: _produtorSelecionado
+                                                  ?.nomeCompleto),
+                                          label: 'Produtor',
+                                        ),
+                                      ],
                                     ),
                                   Row(
                                     mainAxisSize: MainAxisSize.min,

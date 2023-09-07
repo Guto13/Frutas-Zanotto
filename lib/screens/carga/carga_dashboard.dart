@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/carga.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/carga/carga_completa.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,7 +31,9 @@ class _CargaDashboardState extends State<CargaDashboard> {
           ),
         ),
         child: SizedBox(
-          width: double.infinity,
+          width: Responsive.isMobile(context)
+              ? 600
+              : MediaQuery.of(context).size.width,
           child: FutureBuilder<List<Carga>>(
               future: buscarCargas(client),
               builder: (context, snapshot) {
@@ -57,8 +60,9 @@ class _CargaDashboardState extends State<CargaDashboard> {
                       return DataRow(cells: [
                         columnData(e.id.toString(), message: e.id.toString()),
                         columnData(formatDate(e.data, [dd, '-', mm, '-', yyyy]),
-                           message: e.id.toString()),
-                        columnData(e.motorista.toString(), message: e.id.toString()),
+                            message: e.id.toString()),
+                        columnData(e.motorista.toString(),
+                            message: e.id.toString()),
                         columnIconBtn(
                             () => Navigator.push(
                                   context,

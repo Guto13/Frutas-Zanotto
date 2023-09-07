@@ -63,21 +63,38 @@ class CabecalhoProdutores extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: defaultPadding,
-                ),
-                BotaoPadrao(
-                    context: context,
-                    title: 'Add',
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AddProdutores()),
-                      );
-                    }),
+                if (!Responsive.isMobile(context))
+                  const SizedBox(
+                    width: defaultPadding,
+                  ),
+                if (!Responsive.isMobile(context))
+                  BotaoPadrao(
+                      context: context,
+                      title: 'Add',
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AddProdutores()),
+                        );
+                      }),
               ],
             ),
+            if (Responsive.isMobile(context))
+              const SizedBox(
+                height: defaultPadding / 2,
+              ),
+            if (Responsive.isMobile(context))
+              BotaoPadrao(
+                  context: context,
+                  title: 'Add',
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddProdutores()),
+                    );
+                  }),
           ],
         ),
       ),

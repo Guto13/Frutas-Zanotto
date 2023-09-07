@@ -15,61 +15,83 @@ class CabecalhoEmbalagem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        if (!Responsive.isDesktop(context))
-          IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                keyEmbalagens.currentState!.openDrawer();
-              }),
-        TitleMedium(title: 'Embalagens', context: context),
-        Spacer(
-          flex: Responsive.isDesktop(context) ? 2 : 1,
-        ),
-        Expanded(
-          child: TextField(
-            onChanged: (value) {
-              onSearch(value);
-            },
-            decoration: InputDecoration(
-              fillColor: bgColor.withOpacity(0.5),
-              filled: true,
-              border: const OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
-                ),
-              ),
-              suffixIcon: Container(
-                padding: const EdgeInsets.all(defaultPadding * 0.6),
-                margin: const EdgeInsets.only(right: defaultPadding / 3),
-                decoration: const BoxDecoration(
-                  color: primaryColor,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(10),
+        Row(
+          children: [
+            if (!Responsive.isDesktop(context))
+              IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () {
+                    keyEmbalagens.currentState!.openDrawer();
+                  }),
+            TitleMedium(title: 'Embalagens', context: context),
+            Spacer(
+              flex: Responsive.isDesktop(context) ? 2 : 1,
+            ),
+            Expanded(
+              child: TextField(
+                onChanged: (value) {
+                  onSearch(value);
+                },
+                decoration: InputDecoration(
+                  fillColor: bgColor.withOpacity(0.5),
+                  filled: true,
+                  border: const OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
+                    ),
                   ),
-                ),
-                child: const Icon(
-                  Icons.search,
-                  color: textColor,
+                  suffixIcon: Container(
+                    padding: const EdgeInsets.all(defaultPadding * 0.6),
+                    margin: const EdgeInsets.only(right: defaultPadding / 3),
+                    decoration: const BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.search,
+                      color: textColor,
+                    ),
+                  ),
                 ),
               ),
             ),
+            if (!Responsive.isMobile(context))
+              const SizedBox(
+                width: defaultPadding,
+              ),
+            if (!Responsive.isMobile(context))
+              BotaoPadrao(
+                  context: context,
+                  title: 'Add',
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddEmbalagens()),
+                    );
+                  }),
+          ],
+        ),
+        if (Responsive.isMobile(context))
+          const SizedBox(
+            height: defaultPadding / 2,
           ),
-        ),
-        const SizedBox(
-          width: defaultPadding,
-        ),
-        BotaoPadrao(
-            context: context,
-            title: 'Add',
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const AddEmbalagens()),
-              );
-            }),
+        if (Responsive.isMobile(context))
+          BotaoPadrao(
+              context: context,
+              title: 'Add',
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AddEmbalagens()),
+                );
+              }),
       ],
     );
   }

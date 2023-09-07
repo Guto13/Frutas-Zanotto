@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/produtor.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:maca_ipe/screens/produtores/cabecalho_produtores.dart';
 import 'package:maca_ipe/screens/produtores/edit_produtores.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -26,7 +27,6 @@ class _DashboardProdutoresState extends State<DashboardProdutores> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -48,7 +48,9 @@ class _DashboardProdutoresState extends State<DashboardProdutores> {
               ),
             ),
             child: SizedBox(
-              width: double.infinity,
+              width: Responsive.isMobile(context)
+                  ? 600
+                  : MediaQuery.of(context).size.width,
               child: FutureBuilder<List<Produtor>>(
                   future: buscarProdutores(client),
                   builder: (context, snapshot) {

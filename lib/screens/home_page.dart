@@ -57,154 +57,313 @@ class HomePage extends StatelessWidget {
                       ),
                       Padding(
                           padding: const EdgeInsets.all(defaultPadding),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(defaultPadding),
-                                  child: Container(
-                                    padding:
-                                        const EdgeInsets.all(defaultPadding),
-                                    decoration: const BoxDecoration(
-                                      color: bgColor,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
+                          child: !Responsive.isMobile(context)
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                            defaultPadding),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(
+                                              defaultPadding),
+                                          decoration: const BoxDecoration(
+                                            color: bgColor,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                          ),
+                                          child: FutureBuilder<
+                                                  Map<String, double>>(
+                                              future:
+                                                  buscarPaletesPChart(client),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  );
+                                                } else if (snapshot.hasData) {
+                                                  return snapshot
+                                                          .data!.isNotEmpty
+                                                      ? PaletesStatics(
+                                                          paletes:
+                                                              snapshot.data!)
+                                                      : const Center();
+                                                } else {
+                                                  return const Center(
+                                                    child: Text(
+                                                        'Erro ao trazer estatiticas'),
+                                                  );
+                                                }
+                                              }),
+                                        ),
                                       ),
                                     ),
-                                    child: FutureBuilder<Map<String, double>>(
-                                        future: buscarPaletesPChart(client),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          } else if (snapshot.hasData) {
-                                            return snapshot.data!.isNotEmpty
-                                                ? PaletesStatics(
-                                                    paletes: snapshot.data!)
-                                                : const Center();
-                                          } else {
-                                            return const Center(
-                                              child: Text(
-                                                  'Erro ao trazer estatiticas'),
-                                            );
-                                          }
-                                        }),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(defaultPadding),
-                                  child: Container(
-                                    padding:
-                                        const EdgeInsets.all(defaultPadding),
-                                    decoration: const BoxDecoration(
-                                      color: bgColor,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
-                                    ),
-                                    child: FutureBuilder<List<EstoqueListaC>>(
-                                        future: buscarEstoqueC(client),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          } else if (snapshot.hasData) {
-                                            List<EstoqueListaC> estoque =
-                                                snapshot.data!;
+                                    Expanded(
+                                      flex: 2,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                            defaultPadding),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(
+                                              defaultPadding),
+                                          decoration: const BoxDecoration(
+                                            color: bgColor,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                          ),
+                                          child: FutureBuilder<
+                                                  List<EstoqueListaC>>(
+                                              future: buscarEstoqueC(client),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  );
+                                                } else if (snapshot.hasData) {
+                                                  List<EstoqueListaC> estoque =
+                                                      snapshot.data!;
 
-                                            return Column(
-                                              children: [
-                                                const Text(
-                                                    'Estoque Classificado'),
-                                                const SizedBox(
-                                                  height: defaultPadding,
-                                                ),
-                                                EstoqueStatics(
-                                                  estoque: estoque,
-                                                ),
-                                              ],
-                                            );
-                                          } else {
-                                            return const Center(
-                                              child: Text(
-                                                'Erro ao carregar os dados',
-                                                style: TextStyle(
-                                                  color: textColor,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        }),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(defaultPadding),
-                                  child: Container(
-                                    padding:
-                                        const EdgeInsets.all(defaultPadding),
-                                    decoration: const BoxDecoration(
-                                      color: bgColor,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
+                                                  return Column(
+                                                    children: [
+                                                      const Text(
+                                                          'Estoque Classificado'),
+                                                      const SizedBox(
+                                                        height: defaultPadding,
+                                                      ),
+                                                      EstoqueStatics(
+                                                        estoque: estoque,
+                                                      ),
+                                                    ],
+                                                  );
+                                                } else {
+                                                  return const Center(
+                                                    child: Text(
+                                                      'Erro ao carregar os dados',
+                                                      style: TextStyle(
+                                                        color: textColor,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }),
+                                        ),
                                       ),
                                     ),
-                                    child: FutureBuilder<List<EstoqueLista>>(
-                                        future:
-                                            buscarEstoque(client, "EstoqueSC"),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          } else if (snapshot.hasData) {
-                                            List<EstoqueLista> estoque =
-                                                snapshot.data!;
+                                    Expanded(
+                                      flex: 1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                            defaultPadding),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(
+                                              defaultPadding),
+                                          decoration: const BoxDecoration(
+                                            color: bgColor,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                          ),
+                                          child: FutureBuilder<
+                                                  List<EstoqueLista>>(
+                                              future: buscarEstoque(
+                                                  client, "EstoqueSC"),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  );
+                                                } else if (snapshot.hasData) {
+                                                  List<EstoqueLista> estoque =
+                                                      snapshot.data!;
 
-                                            return Column(
-                                              children: [
-                                                const Text(
-                                                    'Estoque a Classificar'),
-                                                const SizedBox(
-                                                  height: defaultPadding,
-                                                ),
-                                                EstoqueStaticsSC(
-                                                  estoque: estoque,
-                                                ),
-                                              ],
-                                            );
-                                          } else {
-                                            return const Center(
-                                              child: Text(
-                                                'Erro ao carregar os dados',
-                                                style: TextStyle(
-                                                  color: textColor,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        }),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )),
+                                                  return Column(
+                                                    children: [
+                                                      const Text(
+                                                          'Estoque a Classificar'),
+                                                      const SizedBox(
+                                                        height: defaultPadding,
+                                                      ),
+                                                      EstoqueStaticsSC(
+                                                        estoque: estoque,
+                                                      ),
+                                                    ],
+                                                  );
+                                                } else {
+                                                  return const Center(
+                                                    child: Text(
+                                                      'Erro ao carregar os dados',
+                                                      style: TextStyle(
+                                                        color: textColor,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.all(defaultPadding),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(
+                                            defaultPadding),
+                                        decoration: const BoxDecoration(
+                                          color: bgColor,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                        ),
+                                        child: FutureBuilder<
+                                                Map<String, double>>(
+                                            future: buscarPaletesPChart(client),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                );
+                                              } else if (snapshot.hasData) {
+                                                return snapshot.data!.isNotEmpty
+                                                    ? PaletesStatics(
+                                                        paletes: snapshot.data!)
+                                                    : const Center();
+                                              } else {
+                                                return const Center(
+                                                  child: Text(
+                                                      'Erro ao trazer estatiticas'),
+                                                );
+                                              }
+                                            }),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: defaultPadding,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.all(defaultPadding),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(
+                                            defaultPadding),
+                                        decoration: const BoxDecoration(
+                                          color: bgColor,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                        ),
+                                        child: FutureBuilder<
+                                                List<EstoqueListaC>>(
+                                            future: buscarEstoqueC(client),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                );
+                                              } else if (snapshot.hasData) {
+                                                List<EstoqueListaC> estoque =
+                                                    snapshot.data!;
+
+                                                return Column(
+                                                  children: [
+                                                    const Text(
+                                                        'Estoque Classificado'),
+                                                    const SizedBox(
+                                                      height: defaultPadding,
+                                                    ),
+                                                    EstoqueStatics(
+                                                      estoque: estoque,
+                                                    ),
+                                                  ],
+                                                );
+                                              } else {
+                                                return const Center(
+                                                  child: Text(
+                                                    'Erro ao carregar os dados',
+                                                    style: TextStyle(
+                                                      color: textColor,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            }),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: defaultPadding,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.all(defaultPadding),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(
+                                            defaultPadding),
+                                        decoration: const BoxDecoration(
+                                          color: bgColor,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                        ),
+                                        child: FutureBuilder<
+                                                List<EstoqueLista>>(
+                                            future: buscarEstoque(
+                                                client, "EstoqueSC"),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                );
+                                              } else if (snapshot.hasData) {
+                                                List<EstoqueLista> estoque =
+                                                    snapshot.data!;
+
+                                                return Column(
+                                                  children: [
+                                                    const Text(
+                                                        'Estoque a Classificar'),
+                                                    const SizedBox(
+                                                      height: defaultPadding,
+                                                    ),
+                                                    EstoqueStaticsSC(
+                                                      estoque: estoque,
+                                                    ),
+                                                  ],
+                                                );
+                                              } else {
+                                                return const Center(
+                                                  child: Text(
+                                                    'Erro ao carregar os dados',
+                                                    style: TextStyle(
+                                                      color: textColor,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            }),
+                                      ),
+                                    ),
+                                  ],
+                                )),
                     ],
                   ),
                 ),

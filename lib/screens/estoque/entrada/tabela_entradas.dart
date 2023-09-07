@@ -7,6 +7,7 @@ import 'package:maca_ipe/componetes_gerais/app_bar.dart';
 import 'package:maca_ipe/componetes_gerais/constants.dart';
 import 'package:maca_ipe/datas/entrada_lista.dart';
 import 'package:maca_ipe/funcoes/banco_de_dados.dart';
+import 'package:maca_ipe/funcoes/responsive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TabelaEntrada extends StatefulWidget {
@@ -66,69 +67,74 @@ class _TabelaEntradaState extends State<TabelaEntrada> {
                         } else if (snapshot.hasData) {
                           entradas = snapshot.data!;
                           return SingleChildScrollView(
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: DataTable(
-                                columnSpacing:
-                                    16.0, // Espaçamento entre colunas
-                                dataRowHeight:
-                                    60.0, // Altura das linhas de dados
-                                headingRowHeight: 70.0,
-                                // Altura da linha de cabeçalho
-                                dividerThickness:
-                                    1.0, // Espessura da borda entre células
-                                horizontalMargin: 20.0,
-                                columns: [
-                                  columnTable('Fruta'),
-                                  columnTable('Quantidade'),
-                                  columnTable('Embalagem'),
-                                  columnTable('Produtor'),
-                                  columnTable('Data'),
-                                ],
-                                rows: entradas.map((e) {
-                                  return DataRow(
-                                      onLongPress: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return Alert(
-                                              content:
-                                                  'Deseja mesmo excluir está entrada?',
-                                              title: 'Deletar',
-                                              onCancel: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              onConfirm: () async {
-                                                setState(() {
-                                                  _isloading = true;
-                                                });
-                                                _onConfirm(
-                                                    e.id,
-                                                    e.fruta.id,
-                                                    e.produtor.id,
-                                                    e.embalagem.id,
-                                                    e.quantidade,
-                                                    e.isClassifi);
-                                                setState(() {
-                                                  _isloading = false;
-                                                });
-                                                Navigator.of(context).pop();
-                                              },
-                                            );
-                                          },
-                                        );
-                                      },
-                                      cells: [
-                                        columnData(
-                                            '${e.fruta.nome} ${e.fruta.variedade}'),
-                                        columnData(e.quantidade.toString()),
-                                        columnData(e.embalagem.nome),
-                                        columnData(
-                                            '${e.produtor.nome} ${e.produtor.sobrenome}'),
-                                        columnData(formatDate(
-                                            e.data, [dd, '-', mm, '-', yyyy])),
-                                      ]);
-                                }).toList(),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: SizedBox(
+                                width: Responsive.isMobile(context)
+                                    ? 600
+                                    : MediaQuery.of(context).size.width,
+                                child: DataTable(
+                                  columnSpacing:
+                                      16.0, // Espaçamento entre colunas
+                                  dataRowHeight:
+                                      60.0, // Altura das linhas de dados
+                                  headingRowHeight: 70.0,
+                                  // Altura da linha de cabeçalho
+                                  dividerThickness:
+                                      1.0, // Espessura da borda entre células
+                                  horizontalMargin: 20.0,
+                                  columns: [
+                                    columnTable('Fruta'),
+                                    columnTable('Quantidade'),
+                                    columnTable('Embalagem'),
+                                    columnTable('Produtor'),
+                                    columnTable('Data'),
+                                  ],
+                                  rows: entradas.map((e) {
+                                    return DataRow(
+                                        onLongPress: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return Alert(
+                                                content:
+                                                    'Deseja mesmo excluir está entrada?',
+                                                title: 'Deletar',
+                                                onCancel: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                onConfirm: () async {
+                                                  setState(() {
+                                                    _isloading = true;
+                                                  });
+                                                  _onConfirm(
+                                                      e.id,
+                                                      e.fruta.id,
+                                                      e.produtor.id,
+                                                      e.embalagem.id,
+                                                      e.quantidade,
+                                                      e.isClassifi);
+                                                  setState(() {
+                                                    _isloading = false;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                              );
+                                            },
+                                          );
+                                        },
+                                        cells: [
+                                          columnData(
+                                              '${e.fruta.nome} ${e.fruta.variedade}'),
+                                          columnData(e.quantidade.toString()),
+                                          columnData(e.embalagem.nome),
+                                          columnData(
+                                              '${e.produtor.nome} ${e.produtor.sobrenome}'),
+                                          columnData(formatDate(e.data,
+                                              [dd, '-', mm, '-', yyyy])),
+                                        ]);
+                                  }).toList(),
+                                ),
                               ),
                             ),
                           );
